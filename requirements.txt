@@ -1,0 +1,4 @@
+# Required python packages for stacken fingerweb
+# Can be installed py "pip install -r requirements.txt"
+
+Django >= 2.0, < 2.1
