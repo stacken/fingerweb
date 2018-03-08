@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = '/'
 
 # Application definition
 
@@ -51,6 +52,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'fingerweb.urls'
+
+EMAIL_HOST = 'vingummi.stacken.kth.se'
 
 TEMPLATES = [
     {
