@@ -6,10 +6,16 @@
     <header>
       <a href="/">Stacken member-site</a>
       {% if user.is_authenticated %}
-      {{user}} (<a href="/accounts/logout/">log out</a>)
+      <span class="user">
+	{{user}} (<a href="/accounts/logout/">log out</a>)
+      </span>
       {% endif %}
     </header>
 
     <main>{% block content %}{% endblock %}</main>
+
+    <footer>
+      <a href="https://www.stacken.kth.se/">Datorföreningen Stacken</a>
+    </footer>
   </body>
 </html>
