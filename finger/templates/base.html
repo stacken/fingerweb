@@ -4,7 +4,10 @@
   </head>
   <body>
     <header>
-      Stacken
+      <a href="/">Stacken member-site</a>
+      {% if user.is_authenticated %}
+      {{user}} (<a href="/accounts/logout/">log out</a>)
+      {% endif %}
     </header>
 
     <main>{% block content %}{% endblock %}</main>

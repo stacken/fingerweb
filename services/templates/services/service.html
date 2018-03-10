@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Tjänsten {{service}}</h1>
+
+{% if has_account %}
+<p>{{user}} has an account for this service.</p>
+{% if secret %}
+<p>Your password is "<code>{{secret}}</code>".</p>
+{% else %}
+<p><a href="?show-secret=t">Show password</a></p>
+{% endif %}
+{% else %}
+<p>You don't have a password for this service yet.</p>
+<form method="post">{% csrf_token %}
+  <button name="action" value="generate">Generate a password</button>
+</form>
+{% endif %}
+{% endblock %}

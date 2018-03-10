@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Välkommen {{user.get_full_name}}</h1>
+
+<p>Här är det tänkt att man ska kunna hantera tjänstekonton för
+  stacken.</p>
+
+<ul>
+  <li><p><a href="/services/matrix/">Matrix</a> (chatrum)</li>
+</ul>
+
+{% endblock %}
