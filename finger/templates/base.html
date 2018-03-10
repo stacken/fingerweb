@@ -1,6 +1,9 @@
+{% load compile_static %}
+{% load static %}
 <!html>
 <html>
   <head>
+    <link rel="stylesheet" href="{% static "fingerweb.scss"|compile %}" />
   </head>
   <body>
     <header>

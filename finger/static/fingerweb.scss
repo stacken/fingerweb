@@ -1,0 +1,48 @@
+$red: #ad0000;
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    background: white;
+    color: #321;
+    display: flex;
+    flex-flow: column;
+
+    > header {
+	background: $red;
+	color: white;
+
+	.user {
+	    text-align: right;
+	    flex-grow: 1;
+	}
+	:link, :visited {
+	    color: inherit;
+	    text-decoration: none;
+
+	    &:hover {
+		text-decoration: underline;
+	    }
+	}
+    }
+    > header, > footer {
+	padding: 1ex 1em;
+	display: flex;
+	flex-flow: row wrap;
+    }
+
+    > main {
+	margin: auto;
+	padding: 1em 1em 4em;
+	max-width: 50em;
+	flex-grow: 2;
+    }
+    > footer {
+	border-top: solid 1px $red;
+	flex-grow: 1;
+    }
+}
