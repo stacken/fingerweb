@@ -6,7 +6,7 @@ from .models import Service
 def service(request, name):
     service = get_object_or_404(Service, name=name)
     if request.POST.get('action') == 'generate':
-        print("Should generate key for %s on %s" % (request.user, service))
+        service.generate_password(request.user)
         return redirect(request.path + "?show-secret=t")
     else:
         account = service.account_for(request.user)

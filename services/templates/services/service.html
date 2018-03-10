@@ -10,6 +10,9 @@
 {% else %}
 <p><a href="?show-secret=t">Show password</a></p>
 {% endif %}
+<form method="post">{% csrf_token %}
+  <button name="action" value="generate">Reset password</button>
+</form>
 {% else %}
 <p>You don't have a password for this service yet.</p>
 <form method="post">{% csrf_token %}
