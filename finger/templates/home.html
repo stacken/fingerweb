@@ -7,7 +7,10 @@
   stacken.</p>
 
 <ul>
-  <li><p><a href="/services/matrix/">Matrix</a> (chatrum)</li>
+  {% for service in services %}
+  <li><p><a href="/services/{{service.name}}/">{{service}}</a>
+      ({{service.shortdesc}})</li>
+  {% endfor %}
 </ul>
 
 {% endblock %}

@@ -2,3 +2,5 @@
 # Can be installed py "pip install -r requirements.txt"
 
 Django >= 2.0, < 2.1
+
+markdown

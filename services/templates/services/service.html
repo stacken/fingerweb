@@ -3,6 +3,8 @@
 {% block content %}
 <h1>Tjänsten {{service}}</h1>
 
+{{service.description_html |safe}}
+
 {% if has_account %}
 <p>{{user}} has an account for this service.</p>
 {% if secret %}
