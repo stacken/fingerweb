@@ -1,16 +1,25 @@
 from django.db import models
 from finger.models import User
+from markdown import markdown
 from random import SystemRandom
 import string
 
 class Service(models.Model):
     name = models.SlugField(db_index=True, unique=True)
+    shortdesc = models.CharField(max_length=100, null=True)
+    longdesc = models.TextField(null=True)
 
     def __str__(self):
         return self.name
 
+    def description_html(self):
+        return markdown(self.longdesc)
+
     def account_for(self, user):
-        return self.serviceuser_set.get(user=user)
+        try:
+            return self.serviceuser_set.get(user=user)
+        except ServiceUser.DoesNotExist:
+            return None
 
     def generate_password(self, user):
         new_password = create_password(18)
@@ -24,6 +33,9 @@ class Service(models.Model):
             obj.secret = new_password
             obj.save()
         return None
+
+    def nr_users(self):
+        return self.serviceuser_set.count()
 
 class ServiceUser(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
