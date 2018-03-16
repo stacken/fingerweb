@@ -9,6 +9,9 @@
 <p>{{user}} has an account for this service.</p>
 {% if secret %}
 <p>Your password is "<code>{{secret}}</code>".</p>
+<script type="text/javascript">
+  window.history.pushState({}, document.title, document.location);
+</script>
 <form method="get"><button>Hide password</button></form>
 {% else %}
 <form method="post">{% csrf_token %}
