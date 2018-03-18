@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import Service
 
-# Create your views here.
+@login_required
 def service(request, name):
     service = get_object_or_404(Service, name=name)
     action = request.POST.get('action')
