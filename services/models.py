@@ -23,7 +23,6 @@ class Service(models.Model):
 
     def generate_password(self, user):
         new_password = create_password(18)
-        print("Should generate key for %s on %s" % (user, self))
         obj, created = ServiceUser.objects.get_or_create(
             service=self,
             user=user,
