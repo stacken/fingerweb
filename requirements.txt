@@ -6,3 +6,4 @@ Django >= 2.0, < 2.1
 django-static-precompiler >= 1.7
 markdown
 gunicorn
+django-environ
