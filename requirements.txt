@@ -7,3 +7,4 @@ django-static-precompiler >= 1.7
 markdown
 gunicorn
 django-environ
+psycopg2
