@@ -3,6 +3,9 @@ FROM python:3
 EXPOSE 8000
 
 ENV PYTHONUNBUFFERED 1
+ARG SECRET_KEY=none
+ARG ALLOWED_HOSTS=localhost
+ARG DATABASE_URL=sqlite:///db.sqlite3
 
 RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
 	&& apt-get update \
