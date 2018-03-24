@@ -1,15 +1,20 @@
 FROM python:3
 
-EXPOSE 8000
+EXPOSE 8080
 
+# Setup environment, ARG are only available during the build.
 ENV PYTHONUNBUFFERED 1
 ARG SECRET_KEY=none
 ARG ALLOWED_HOSTS=localhost
 ARG DATABASE_URL=sqlite:///db.sqlite3
 
-RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
-	&& apt-get update \
-	&& apt-get -y install ruby-sass nginx
+RUN apt-get update \
+	&& apt-get -y install ruby-sass nginx \
+	# Install pip2 for supervisor and supervisor-stdout \
+	&& apt-get install -y python-pip \
+	&& pip2 install supervisor supervisor-stdout \
+	# Remove repo metadata to keep layer size down \
+	&& rm -rf /var/lib/apt/lists/*
 
 ADD requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
@@ -19,23 +24,22 @@ COPY fingerweb /app/fingerweb/
 COPY services /app/services/
 WORKDIR /app
 
-RUN /app/manage.py migrate \
+RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
+	# Get rid of warnings \
+	&& touch /app/.env \
+	# compilestatic requires an database, hence migrate. \
+	&& /app/manage.py migrate \
+	# Compile static resources \
 	&& /app/manage.py compilestatic \
 	&& yes yes | /app/manage.py collectstatic \
+	# Clean up, make directories and fix permissions \
 	&& rm /app/*.sqlite3 \
 	&& rm /app/*.txt \
-	&& apt-get -y autoremove \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& chown -R finger:finger /app /var/log/nginx /var/lib/nginx
+	&& mkdir /app/logs \
+	&& chown -R finger:finger /app
 
-ADD nginx-host.conf /etc/nginx/nginx.conf
+ADD conf/nginx.conf /etc/nginx/nginx.conf
+ADD conf/supervisord.conf /etc/supervisor/
+ADD conf/supervisor/ /etc/supervisor/conf.d/
 
-USER finger
-
-CMD bash -c '\
-	/app/manage.py migrate && \
-	nginx -c /etc/nginx/nginx.conf & \
-	exec gunicorn fingerweb.wsgi:application \
-		--bind 0.0.0.0:8000 \
-		--workers 3 \
-	'
+CMD ["supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
