@@ -26,6 +26,18 @@ Then the server can be started:
 ./manage.py runserver
 ```
 
+## Local Docker build
+
+Possible you need to append sudo in front of `docker`, or become a member of the docker group.
+
+Build a image called fingerweb:
+
+`$ docker build -t fingerweb .`
+
+Run the image, append the environment and map the port to the host:
+
+`$ docker run -ti -e SECRET_KEY=none -e ALLOWED_HOSTS=localhost -e DATABASE_URL=sqlite:///db.sqlite3 -p 8080:8080 fingerweb`
+
 ## Production build
 
 A image is built and published to Docker Hub at `stacken/fingerweb:tag` where
