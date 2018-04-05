@@ -31,7 +31,7 @@ RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
 	&& /app/manage.py migrate \
 	# Compile static resources \
 	&& /app/manage.py compilestatic \
-	&& yes yes | /app/manage.py collectstatic \
+	&& /app/manage.py collectstatic --noinput \
 	# Clean up, make directories and fix permissions \
 	&& rm /app/*.sqlite3 \
 	&& rm /app/*.txt \
