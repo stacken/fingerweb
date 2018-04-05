@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager as AuthUserManager
 from django.db import models
 import re
 
-class UserManager(models.Manager):
+class UserManager(AuthUserManager):
     def update_data(self, data):
         """
         Take an iterable of user data (the result of parsing finger.json),
