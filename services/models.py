@@ -8,6 +8,7 @@ class Service(models.Model):
     name = models.SlugField(db_index=True, unique=True)
     shortdesc = models.CharField(max_length=100, null=True)
     longdesc = models.TextField(null=True)
+    password = models.CharField(null=True, max_length=128)
 
     def __str__(self):
         return self.name
