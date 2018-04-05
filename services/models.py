@@ -2,7 +2,7 @@ from django.db import models
 from finger.models import User
 from markdown import markdown
 from random import SystemRandom
-import string
+from string import ascii_lowercase, ascii_letters, digits
 
 class Service(models.Model):
     name = models.SlugField(db_index=True, unique=True)
@@ -23,7 +23,7 @@ class Service(models.Model):
             return None
 
     def generate_password(self, user):
-        new_password = create_password(18)
+        new_password = create_password()
         obj, created = ServiceUser.objects.get_or_create(
             service=self,
             user=user,
@@ -42,7 +42,10 @@ class ServiceUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     secret = models.TextField()
 
-def create_password(length):
-    chars = 2*string.ascii_lowercase + string.ascii_letters + 3*string.digits
+def create_password(length=None):
+    special_chars = '-.*<>_!%&/()=?@${[]}'
+    chars = 2*ascii_lowercase + ascii_letters + 3*digits + special_chars
     rand = SystemRandom()
+    if not length:
+        length = rand.randint(16, 24)
     return ''.join(rand.choice(chars) for x in range(length))
