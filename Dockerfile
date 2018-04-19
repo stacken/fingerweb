@@ -27,6 +27,7 @@ WORKDIR /app
 RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
 	# Get rid of warnings \
 	&& touch /app/.env \
+	&& sed -i 's/XXX_BUILD_DATE_XXX/`date +"%F %T"`/' /app/fingerweb/settings.py \
 	# compilestatic requires an database, hence migrate. \
 	&& /app/manage.py migrate \
 	# Compile static resources \

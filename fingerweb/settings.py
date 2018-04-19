@@ -18,6 +18,8 @@ ADMINS = (
 MANAGERS = ADMINS
 DEFAULT_FROM_EMAIL = 'staff@stacken.kth.se'
 
+BUILD_DATE = 'XXX_BUILD_DATE_XXX'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

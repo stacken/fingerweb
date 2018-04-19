@@ -51,6 +51,9 @@ body {
     > footer {
 	border-top: solid 1px $red;
 	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
     }
 }
 

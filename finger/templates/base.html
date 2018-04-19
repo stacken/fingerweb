@@ -1,4 +1,4 @@
-{% load compile_static static %}<!doctype html>
+{% load compile_static static finger %}<!doctype html>
 <html>
   <head>
     <title>{% block title %}Fingerweb{% endblock %} - Stacken</title>
@@ -18,6 +18,7 @@
 
     <footer>
       <a href="https://www.stacken.kth.se/">Datorföreningen Stacken</a>
+      <span>Fingerweb {% build_date %}</span>
     </footer>
   </body>
 </html>
