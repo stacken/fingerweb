@@ -9,9 +9,26 @@
 {% if has_account %}
 <p>{{user}} has an account for this service.</p>
 {% if secret %}
-<p>Your password is "<code>{{secret}}</code>".</p>
+<p class="pwd">Your password is "<code>{{secret}}</code>". </p>
 <script type="text/javascript">
   window.history.pushState({}, document.title, document.location);
+
+  var copyBtn = document.createElement('button');
+  copyBtn.append(document.createTextNode('Copy'))
+  document.querySelector('p.pwd').append(copyBtn);
+  copyBtn.addEventListener('click', function(event) {
+    var pwd = document.querySelector('p.pwd code');
+    var range = document.createRange();
+    range.selectNode(pwd);
+    window.getSelection().addRange(range);
+
+    try {
+      var successful = document.execCommand('copy');
+      console.log('Copy email command was ' + (successful ? '' : 'un') + 'successful');
+    } catch(err) {
+      console.log('Oops, unable to copy');
+    }
+  });
 </script>
 <form method="get"><button>Hide password</button></form>
 {% else %}
