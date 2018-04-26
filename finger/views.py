@@ -1,9 +1,10 @@
+from django.contrib.auth import views  as ca_views
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import render
 from services.models import Service
-from .forms import UploadFileForm
+from .forms import PasswordResetForm, UploadFileForm
 from .models import User
 
 @login_required
@@ -27,3 +28,7 @@ def upload_json(request):
     return render(request, 'upload_json.html', {
         'form': form,
     })
+
+class PasswordResetView(ca_views.PasswordResetView):
+    """Override djago.contrib.auth to use custom Form object."""
+    form_class = PasswordResetForm
