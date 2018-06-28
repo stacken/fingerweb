@@ -16,6 +16,9 @@ class UserManager(AuthUserManager):
                     'first_name': entry.get('förnamn'),
                     'last_name': entry.get('efternamn'),
                     'email': entry.get('mailadress'),
+                    'payed_year': entry.get('betalt', None),
+                    'ths_claimed_vt': entry.get('THS-studerande', None),
+                    'ths_claimed_ht': entry.get('THS-studerande', None),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
