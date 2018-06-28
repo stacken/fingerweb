@@ -36,7 +36,16 @@ Build a image called fingerweb:
 
 Run the image, append the environment and map the port to the host:
 
-`$ docker run -ti -e SECRET_KEY=none -e ALLOWED_HOSTS=localhost -e DATABASE_URL=sqlite:///db.sqlite3 -p 8080:8080 fingerweb`
+```
+$ docker run -ti \
+  -e SECRET_KEY=none \
+  -e ALLOWED_HOSTS=127.0.0.1 \
+  -e DATABASE_URL=sqlite:///db.sqlite3 \
+  -e DEBUG=True \
+  -e DJANGOADMIN_PASSWORD=password \
+  -p 8080:8080 \
+  fingerweb
+```
 
 ## Production build
 
