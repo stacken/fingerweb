@@ -10,6 +10,8 @@
   {% for service in services %}
   <li><p><a href="/services/{{service.name}}/">{{service}}</a>
       ({{service.shortdesc}})</li>
+  {% empty %}
+  <li><p>No services found, <a href="/admin/services/service/add/">create them</a>!</p></li>
   {% endfor %}
 </ul>
 
