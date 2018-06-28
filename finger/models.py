@@ -27,4 +27,10 @@ class UserManager(AuthUserManager):
                                                       defaults=fields)
 
 class User(AbstractUser):
+    payed_year = models.PositiveSmallIntegerField(null=True)
+    ths_verified_vt = models.PositiveSmallIntegerField(null=True)
+    ths_verified_ht = models.PositiveSmallIntegerField(null=True)
+    ths_claimed_vt = models.PositiveSmallIntegerField(null=True)
+    ths_claimed_ht = models.PositiveSmallIntegerField(null=True)
+
     objects = UserManager()
