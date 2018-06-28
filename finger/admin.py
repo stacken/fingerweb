@@ -7,6 +7,9 @@ class StackenUserAdmin(admin.ModelAdmin):
                     'last_name',
                     'payed_year')
 
+    search_fields = ('username', 'first_name', 'last_name')
+    list_filter = ('payed_year', 'is_superuser')
+
     fieldsets = (
         (None, {
             'fields': (
