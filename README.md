@@ -39,8 +39,30 @@ Run the image, append the environment and map the port to the host:
 ```
 $ docker run -ti \
   -e SECRET_KEY=none \
-  -e ALLOWED_HOSTS=127.0.0.1 \
+  -e ALLOWED_HOSTS=127.0.0.1,localhost \
   -e DATABASE_URL=sqlite:///db.sqlite3 \
+  -e DEBUG=True \
+  -e DJANGOADMIN_PASSWORD=password \
+  -p 8080:8080 \
+  fingerweb
+```
+
+With this you will end up with a clean environment, every time. If you like to keep
+the database between runs, I recommend that you spins up a separate database container
+and link then together, for example:
+
+```
+$ docker run -d \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_DB=fingerweb \
+  -e POSTGRES_PASSWORD=dbpassword \
+  --name fingerwebdb \
+  postgres:10
+$ docker run -ti \
+  --link fingerwebdb \
+  -e SECRET_KEY=none \
+  -e ALLOWED_HOSTS=127.0.0.1,localhost \
+  -e DATABASE_URL=psql://postgres:dbpassword@fingerwebdb:5432/fingerweb \
   -e DEBUG=True \
   -e DJANGOADMIN_PASSWORD=password \
   -p 8080:8080 \
