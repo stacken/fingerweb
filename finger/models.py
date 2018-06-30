@@ -64,8 +64,12 @@ class UserManager(AuthUserManager):
 
                 if entry.get('utträdesdatum'):
                     fields['date_parted'] = parser.parse(entry.get('utträdesdatum'))
+                    fields['is_active'] = False
                 else:
                     fields['date_parted'] = None
+
+                if entry.get('Utesluten'):
+                    fields['is_active'] = False
 
                 user, created = self.update_or_create(username=username,
                                                       defaults=fields)
