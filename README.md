@@ -4,28 +4,6 @@ A web app that might replace finger.{txt,json}.
 The first usefull thing it might do is handle service-specific passwords
 for some other web apps.
 
-## Local development
-
-To run in development mode, first make sure you have a (virtual) env with
-the required packages installed:
-
-```
-pip install -r requirements.txt
-```
-
-In development mode, a sqlite database is used.  It is created by applying
-the migrations:
-
-```
-./manage.py migrate
-```
-
-Then the server can be started:
-
-```
-./manage.py runserver
-```
-
 ## Local Docker build
 
 Possible you need to append sudo in front of `docker`, or become a member of the docker group.
