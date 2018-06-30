@@ -13,17 +13,34 @@ class StackenUserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                'title',
                 'first_name',
                 'last_name',
-                'email'
+                'email',
+                'address',
+                'phone',
+                'comments'
                 )
         }),
         ('Medlemsstatus', {
             'fields': (
                 'payed_year',
-                ('ths_claimed_vt', 'ths_claimed_ht'),
                 ('ths_verified_vt', 'ths_verified_ht'),
-                'date_joined'
+                ('date_joined', 'date_parted'),
+                ('honourable_member', 'support_member')
+                )
+        }),
+        ('Access', {
+            'fields': (
+                'has_key',
+                'keycard_number'
+                )
+        }),
+        ('Kåren', {
+            'fields': (
+                'ths_name',
+                ('ths_claimed_vt', 'ths_claimed_ht'),
+                'kth_account'
                 )
         }),
         ('Admin', {
