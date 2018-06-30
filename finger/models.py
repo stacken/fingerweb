@@ -52,6 +52,7 @@ class UserManager(AuthUserManager):
                     'support_member': entry.get('stödmedlem', False),
                     'honourable_member': entry.get('Hedersmedlem', False),
                     'keycard_number': entry.get('kortnr'),
+                    'date_joined': parser.parse(entry.get('inträdesdatum', '1970-01-01')),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
@@ -59,12 +60,6 @@ class UserManager(AuthUserManager):
                         fields['email'] = kthname + '@kth.se'
                     else:
                         fields['email'] = username + '@stacken.kth.se'
-
-                if entry.get('inträdesdatum'):
-                    fields['date_joined'] = parser.parse(entry.get('inträdesdatum'))
-                else:
-                    # Because I did not feel like to change the default type
-                    fields['date_joined'] = parser.parse("1970-01-01")
 
                 if entry.get('utträdesdatum'):
                     fields['date_parted'] = parser.parse(entry.get('utträdesdatum'))
