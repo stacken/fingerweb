@@ -27,7 +27,9 @@ class MemberStatusListFilter(admin.SimpleListFilter):
                 ths_member_verified = Q(ths_verified_ht__gte=t.year)
 
             return queryset.filter(
-                Q(payed_year__gte=t.year) | ths_member_verified
+                Q(payed_year__gte=t.year) |
+                Q(honourable_member__exact=True) |
+                ths_member_verified
             ).exclude(is_active__exact=False)
 
 class StackenUserAdmin(admin.ModelAdmin):
