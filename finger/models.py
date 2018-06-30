@@ -12,6 +12,19 @@ class UserManager(AuthUserManager):
         for entry in data:
             username = entry.get('användarnamn')
             if username and re.match('^[a-z]+$', username) and username != 'stacken':
+
+                phone_list = [entry.get('arbtelefon')] + \
+                             [entry.get('hemtelefon')]
+
+                comments_list = [entry.get('avdelning')] + \
+                                [entry.get('distrubution')] + \
+                                [entry.get('organisation')] + \
+                                [entry.get('status')] + \
+                                [entry.get('syssel')] + \
+                                [entry.get('comment')]
+                if entry.get('Utesluten'):
+                    comments_list = ["Utesluten"] + comments_list
+
                 fields = {
                     'first_name': entry.get('förnamn'),
                     'last_name': entry.get('efternamn'),
@@ -19,6 +32,8 @@ class UserManager(AuthUserManager):
                     'payed_year': entry.get('betalt', None),
                     'ths_claimed_vt': entry.get('THS-studerande', None),
                     'ths_claimed_ht': entry.get('THS-studerande', None),
+                    'phone': ", ".join(filter(None, phone_list)),
+                    'comments': "\n".join(filter(None, comments_list)),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
