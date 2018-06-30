@@ -8,3 +8,4 @@ markdown
 gunicorn
 django-environ
 psycopg2-binary
+python-dateutil

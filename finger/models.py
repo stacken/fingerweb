@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as AuthUserManager
 from django.db import models
 import re
+from dateutil import parser
 
 class UserManager(AuthUserManager):
     def update_data(self, data):
@@ -41,6 +42,18 @@ class UserManager(AuthUserManager):
                         fields['email'] = kthname + '@kth.se'
                     else:
                         fields['email'] = username + '@stacken.kth.se'
+
+                if entry.get('inträdesdatum'):
+                    fields['date_joined'] = parser.parse(entry.get('inträdesdatum'))
+                else:
+                    # Because I did not feel like to change the default type
+                    fields['date_joined'] = parser.parse("1970-01-01")
+
+                if entry.get('utträdesdatum'):
+                    fields['date_parted'] = parser.parse(entry.get('utträdesdatum'))
+                else:
+                    fields['date_parted'] = None
+
                 user, created = self.update_or_create(username=username,
                                                       defaults=fields)
 
