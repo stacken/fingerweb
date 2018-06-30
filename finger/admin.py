@@ -48,6 +48,7 @@ class StackenUserAdmin(admin.ModelAdmin):
     list_filter = ('support_member',
                    'honorary_member',
                    MemberStatusListFilter,
+                   'has_key',
                    'payed_year',
                    'is_superuser')
 
