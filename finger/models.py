@@ -30,9 +30,9 @@ class UserManager(AuthUserManager):
                     'first_name': entry.get('förnamn'),
                     'last_name': entry.get('efternamn'),
                     'email': entry.get('mailadress'),
-                    'payed_year': entry.get('betalt', None),
-                    'ths_claimed_vt': entry.get('THS-studerande', None),
-                    'ths_claimed_ht': entry.get('THS-studerande', None),
+                    'payed_year': entry.get('betalt'),
+                    'ths_claimed_vt': entry.get('THS-studerande'),
+                    'ths_claimed_ht': entry.get('THS-studerande'),
                     'phone': ", ".join(filter(None, phone_list)),
                     'comments': "\n".join(filter(None, comments_list)),
                 }
