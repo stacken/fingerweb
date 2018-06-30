@@ -46,6 +46,8 @@ class UserManager(AuthUserManager):
                     'phone': ", ".join(filter(None, phone_list)),
                     'comments': "\n".join(filter(None, comments_list)),
                     'address': "\n".join(filter(None, address_list)),
+                    'ths_name': entry.get('THS-namn'),
+                    'kth_account': entry.get('KTH-konto'),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
