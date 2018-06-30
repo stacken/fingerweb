@@ -22,14 +22,14 @@ class MemberStatusListFilter(admin.SimpleListFilter):
                 t = datetime.now() - timedelta(days=2*365)
 
             if t.month <= 7:
-                ths_member_verified = Q(ths_verified_vt__gte=t.year)
+                ths_member_claimed = Q(ths_claimed_vt__gte=t.year)
             else:
-                ths_member_verified = Q(ths_verified_ht__gte=t.year)
+                ths_member_claimed = Q(ths_claimed_ht__gte=t.year)
 
             return queryset.filter(
                 Q(payed_year__gte=t.year) |
                 Q(honorary_member__exact=True) |
-                ths_member_verified
+                ths_member_claimed
             ).exclude(is_active__exact=False)
 
 class StackenUserAdmin(admin.ModelAdmin):
