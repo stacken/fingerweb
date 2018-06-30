@@ -26,9 +26,15 @@ class MemberStatusListFilter(admin.SimpleListFilter):
             else:
                 ths_member_claimed = Q(ths_claimed_ht__gte=t.year)
 
+            # If this is "active" t will be in the future, disabling this
+            # option. If this is "recent" t is already two years ago so
+            # is_new_member will be increased to only "1 year ago".
+            is_new_member = Q(date_joined__gte=t + timedelta(days=365))
+
             return queryset.filter(
                 Q(payed_year__gte=t.year) |
                 Q(honorary_member__exact=True) |
+                is_new_member |
                 ths_member_claimed
             ).exclude(is_active__exact=False)
 
