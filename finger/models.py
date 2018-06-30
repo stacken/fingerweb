@@ -26,6 +26,15 @@ class UserManager(AuthUserManager):
                 if entry.get('Utesluten'):
                     comments_list = ["Utesluten"] + comments_list
 
+                if not entry.get('Fel_adress'):
+                    address_list = [entry.get('gatuadress')] + \
+                                   [entry.get('postadress')] + \
+                                   [entry.get('land')]
+                    if entry.get('c/o'):
+                        address_list = ["c/o " + entry.get('c/o')] + address_list
+                else:
+                    address_list = []
+
                 fields = {
                     'first_name': entry.get('förnamn'),
                     'last_name': entry.get('efternamn'),
@@ -35,6 +44,7 @@ class UserManager(AuthUserManager):
                     'ths_claimed_ht': entry.get('THS-studerande'),
                     'phone': ", ".join(filter(None, phone_list)),
                     'comments': "\n".join(filter(None, comments_list)),
+                    'address': "\n".join(filter(None, address_list)),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
