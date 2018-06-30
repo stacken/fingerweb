@@ -48,6 +48,10 @@ class UserManager(AuthUserManager):
                     'address': "\n".join(filter(None, address_list)),
                     'ths_name': entry.get('THS-namn'),
                     'kth_account': entry.get('KTH-konto'),
+                    'has_key': entry.get('Hallnyckel', False),
+                    'support_member': entry.get('stödmedlem', False),
+                    'honourable_member': entry.get('Hedersmedlem', False),
+                    'keycard_number': entry.get('kortnr'),
                 }
                 if not fields.get('email'):
                     kthname = entry.get('KTH-konto')
@@ -68,7 +72,7 @@ class UserManager(AuthUserManager):
                 else:
                     fields['date_parted'] = None
 
-                if entry.get('Utesluten'):
+                if entry.get('Utesluten') or entry.get('Slutat'):
                     fields['is_active'] = False
 
                 user, created = self.update_or_create(username=username,
