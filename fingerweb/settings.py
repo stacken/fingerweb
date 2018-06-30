@@ -122,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'sv-se'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'CET'
 
