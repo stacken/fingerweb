@@ -50,7 +50,7 @@ class UserManager(AuthUserManager):
                     'kth_account': entry.get('KTH-konto'),
                     'has_key': entry.get('Hallnyckel', False),
                     'support_member': entry.get('stödmedlem', False),
-                    'honourable_member': entry.get('Hedersmedlem', False),
+                    'honorary_member': entry.get('Hedersmedlem', False),
                     'keycard_number': entry.get('kortnr'),
                     'date_joined': parser.parse(entry.get('inträdesdatum', '1970-01-01')),
                 }
@@ -83,7 +83,7 @@ class User(AbstractUser):
     comments = models.TextField(null=True, blank=True, verbose_name="Comments", help_text="One or more comments about the member.")
     address = models.TextField(null=True, blank=True, verbose_name="Address", help_text="The members address.")
     has_key = models.BooleanField(default=False, verbose_name="Has a Key", help_text="If the member has a key to the computer hall.")
-    honourable_member = models.BooleanField(default=False, verbose_name="Honourable Member", help_text="If the member is a Honourable member.")
+    honorary_member = models.BooleanField(default=False, verbose_name="Honorary Member", help_text="If the member is a honorary member.")
     support_member = models.BooleanField(default=False, verbose_name="Support Member", help_text="The memeber is an support member, the member has no voting rights.")
     keycard_number = models.PositiveIntegerField(null=True, blank=True, verbose_name="Keycard Number", help_text="The number of KTH's keycard, used by us to grant members access to the clubroom.")
     kth_account = models.CharField(null=True, blank=True, max_length=255, verbose_name="KTH account", help_text="The KTH accound name, useful when validating THS membership status.")

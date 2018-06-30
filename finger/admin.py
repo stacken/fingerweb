@@ -28,7 +28,7 @@ class MemberStatusListFilter(admin.SimpleListFilter):
 
             return queryset.filter(
                 Q(payed_year__gte=t.year) |
-                Q(honourable_member__exact=True) |
+                Q(honorary_member__exact=True) |
                 ths_member_verified
             ).exclude(is_active__exact=False)
 
@@ -40,7 +40,7 @@ class StackenUserAdmin(admin.ModelAdmin):
 
     search_fields = ('username', 'first_name', 'last_name')
     list_filter = ('support_member',
-                   'honourable_member',
+                   'honorary_member',
                    MemberStatusListFilter,
                    'payed_year',
                    'is_superuser')
@@ -62,7 +62,7 @@ class StackenUserAdmin(admin.ModelAdmin):
                 'payed_year',
                 ('ths_verified_vt', 'ths_verified_ht'),
                 ('date_joined', 'date_parted'),
-                ('honourable_member', 'support_member')
+                ('honorary_member', 'support_member')
                 )
         }),
         ('Access', {
