@@ -47,6 +47,24 @@ $ docker run -ti \
   fingerweb
 ```
 
+## manage.py
+
+This example will volume mount in the project files to the container. New migrations
+are then created.
+
+```
+$ docker run -ti \
+  --link fingerwebdb \
+  -e SECRET_KEY=none \
+  -e ALLOWED_HOSTS=127.0.0.1,localhost \
+  -e DATABASE_URL=psql://postgres:dbpassword@fingerwebdb:5432/fingerweb \
+  -e DEBUG=True \
+  -v $PWD:/app \
+  -e DJANGOADMIN_PASSWORD=password \
+  fingerweb \
+  /app/manage.py makemigrations
+```
+
 ## Production build
 
 A image is built and published to Docker Hub at `stacken/fingerweb:tag` where
