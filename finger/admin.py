@@ -44,7 +44,12 @@ class StackenUserAdmin(admin.ModelAdmin):
                     'last_name',
                     'payed_year')
 
-    search_fields = ('username', 'first_name', 'last_name')
+    search_fields = ('username',
+                     'first_name',
+                     'last_name',
+                     'ths_name',
+                     'kth_account')
+
     list_filter = ('support_member',
                    'honorary_member',
                    MemberStatusListFilter,
