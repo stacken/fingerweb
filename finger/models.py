@@ -36,6 +36,7 @@ class UserManager(AuthUserManager):
                     address_list = []
 
                 fields = {
+                    'title': entry.get('titel'),
                     'first_name': entry.get('förnamn'),
                     'last_name': entry.get('efternamn'),
                     'email': entry.get('mailadress'),
