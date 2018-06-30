@@ -14,22 +14,22 @@ class UserManager(AuthUserManager):
             username = entry.get('användarnamn')
             if username and re.match('^[a-z]+$', username) and username != 'stacken':
 
-                phone_list = [entry.get('arbtelefon')] + \
-                             [entry.get('hemtelefon')]
+                phone_list = [entry.get('arbtelefon'),
+                              entry.get('hemtelefon')]
 
-                comments_list = [entry.get('avdelning')] + \
-                                [entry.get('distrubution')] + \
-                                [entry.get('organisation')] + \
-                                [entry.get('status')] + \
-                                [entry.get('syssel')] + \
-                                [entry.get('comment')]
+                comments_list = [entry.get('avdelning'),
+                                 entry.get('distrubution'),
+                                 entry.get('organisation'),
+                                 entry.get('status'),
+                                 entry.get('syssel'),
+                                 entry.get('comment')]
                 if entry.get('Utesluten'):
                     comments_list = ["Utesluten"] + comments_list
 
                 if not entry.get('Fel_adress'):
-                    address_list = [entry.get('gatuadress')] + \
-                                   [entry.get('postadress')] + \
-                                   [entry.get('land')]
+                    address_list = [entry.get('gatuadress'),
+                                    entry.get('postadress'),
+                                    entry.get('land')]
                     if entry.get('c/o'):
                         address_list = ["c/o " + entry.get('c/o')] + address_list
                 else:
