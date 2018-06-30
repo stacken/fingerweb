@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import User
 from django.db.models import Q
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class MemberStatusListFilter(admin.SimpleListFilter):
     title = "Members Status"
@@ -10,12 +10,17 @@ class MemberStatusListFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('active', "Active"),
+            ('recent', "Recent"),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'active':
+        if self.value() == 'active' or self.value() == 'recent':
 
-            t = datetime.now()
+            if self.value() == 'active':
+                t = datetime.now()
+            else:
+                t = datetime.now() - timedelta(days=2*365)
+
             if t.month <= 7:
                 ths_member_verified = Q(ths_verified_vt__gte=t.year)
             else:
