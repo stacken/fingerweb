@@ -68,7 +68,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'fingerweb.urls'
 
-EMAIL_HOST = 'vingummi.stacken.kth.se'
+EMAIL_HOST = 'smtp.kth.se'
 EMAIL_USE_TLS = False
 
 TEMPLATES = [
