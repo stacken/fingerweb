@@ -60,6 +60,7 @@ class StackenUserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                'username',
                 'title',
                 'first_name',
                 'last_name',
