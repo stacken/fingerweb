@@ -1,4 +1,5 @@
 from base64 import b64decode
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse, HttpResponseForbidden
@@ -26,8 +27,14 @@ def passwords(request, name):
     if auth_user != name or not check_password(auth_key, service.password):
         return HttpResponseForbidden()
 
+    query = service.serviceuser_set
+    since = request.GET.get('since')
+    if since:
+        since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%S')
+        query = query.filter(modified__gte=since)
+
     return JsonResponse(dict(
-        service.serviceuser_set.values_list('user__username', 'secret')
+        query.values_list('user__username', 'secret')
     ))
 
 def basic_auth(request):

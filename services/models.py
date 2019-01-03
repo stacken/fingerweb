@@ -41,6 +41,7 @@ class ServiceUser(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     secret = models.TextField()
+    modified = models.DateTimeField(auto_now=True)
 
 def create_password(length=None):
     special_chars = '-.*<>_!%&/()=?@${[]}'
