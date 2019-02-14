@@ -30,7 +30,7 @@ def passwords(request, name):
     query = service.serviceuser_set
     since = request.GET.get('since')
     if since:
-        since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%S')
+        since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%S%Z')
         query = query.filter(modified__gte=since)
 
     return JsonResponse(dict(
