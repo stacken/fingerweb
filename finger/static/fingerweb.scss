@@ -56,3 +56,25 @@ body {
 form {
     display: inline-block;
 }
+
+p.pwd {
+    code:not(.copyable) {
+	&:before { content: '"'; display: inline; }
+	&:after { content: '"'; display: inline; }
+    }
+    code.copyable,
+    button.copy {
+	border: solid .5px #806060;
+	display: inline-block;
+	height: 1.5em;
+	vertical-align: middle;
+	padding: 1px 1ex;
+    }
+    code.copyable {
+	border-right: 0;
+	border-radius: .3em 0 0 .3em;
+    }
+    button.copy {
+	border-radius: 0 .3em .3em 0;
+    }
+}
