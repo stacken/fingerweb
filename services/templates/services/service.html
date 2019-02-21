@@ -9,9 +9,32 @@
 {% if has_account %}
 <p>{{user}} has an account for this service.</p>
 {% if secret %}
-<p>Your password is "<code>{{secret}}</code>".</p>
+<p class="pwd">Your password is <code>{{secret}}</code>. </p>
 <script type="text/javascript">
   window.history.pushState({}, document.title, document.location);
+
+  if ('execCommand' in document) {
+      var code = document.querySelector('p.pwd code');
+      code.insertAdjacentHTML(
+	  'afterend',
+	  "<button class='copy' title='Copy'><svg class='copy-svg' width='1em' height='1em' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'><title>Copy</title><path d='M946 214q23 0 38 16t16 38v678q0 23-16 38t-38 16H411q-23 0-38-16t-16-38V786H54q-23 0-38-16T0 732V357q0-22 11-49t27-42L266 38q15-16 42-27t49-11h232q23 0 38 16t16 38v183q38-23 71-23zM643 333L476 500h167zM286 119L119 286h167zm109 361l176-176V71H357v233q0 22-15 37t-38 16H71v357h286V571q0-22 11-49t27-42zm534 449V286H714v232q0 22-15 38t-38 15H429v358'/></svg></button>"
+      );
+      code.classList.add('copyable')
+      var copyBtn = document.querySelector('p.pwd button');
+      copyBtn.addEventListener('click', function(event) {
+	  var pwd = document.querySelector('p.pwd code');
+	  var range = document.createRange();
+	  range.selectNode(pwd);
+	  window.getSelection().addRange(range);
+
+	  try {
+	      var successful = document.execCommand('copy');
+	      console.log('Copy email command was ' + (successful ? '' : 'un') + 'successful');
+	  } catch(err) {
+	      console.log('Oops, unable to copy');
+	  }
+      });
+  }
 </script>
 <form method="get"><button>Hide password</button></form>
 {% else %}
