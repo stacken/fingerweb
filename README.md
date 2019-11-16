@@ -19,6 +19,21 @@ This example will enter a running container and run manage.py.
 docker-compose exec fingerweb /app/manage.py makemigrations
 ```
 
+## Run django outside Docker
+
+Sometimes it can be easier to run the application directly on the host.
+
+```
+virtualenv -p python3 .env
+. .env/bin/activate
+export SECRET_KEY=none
+export ALLOWED_HOSTS=127.0.0.1,localhost
+export DEBUG=True
+export DATABASE_URL=sqlite:///db.sqlite3
+export DJANGOADMIN_PASSWORD=password
+./manage.py
+```
+
 ## Production build
 
 A image is built and published to Docker Hub at `stacken/fingerweb:tag` where
