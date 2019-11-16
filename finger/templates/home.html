@@ -3,6 +3,67 @@
 {% block content %}
 <h1>Välkommen {{user.get_full_name}}</h1>
 
+<p>
+  Här kan du se data vi har om dig. Du kan läsa mer om vår
+  <a href="https://www.stacken.kth.se/club/integritetspolicy/">integritetspolicy</a>
+  på vår hemsida. Vill du ha någon information ändrad vad god och kontakta
+  <a href="https://www.stacken.kth.se/club/">styrelsen</a>. Inaktiva konton kommer bli
+  först inaktiverade, och sen borttagna.
+</p>
+
+{% if not user.is_member %}
+<p>
+  Varning! Du är inte noterad som medlem sedan {{ user.last_member }}. Vi kommer snart
+  stänga och sedan ta bort ditt konto. Kontakta styrelsen om du fortfarande vill vara
+  medlem.
+</p>
+{% endif %}
+
+<table class="usertable">
+  <tr>
+    <th>User</th>
+    <td>{{ user.username }}</td>
+  </tr>
+  <tr>
+    <th>Name</th>
+    <td>{{ user.get_full_name }}</td>
+  </tr>
+  <tr>
+    <th>Email address</th>
+    <td>{{ user.email }}</td>
+  </tr>
+  <tr>
+    <th>Member status</th>
+    <td>
+      {% if user.is_member %}
+        Active member
+      {% else %}
+        Inactive member
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th>Phone</th>
+    <td>{{ user.phone }}</td>
+  </tr>
+  <tr>
+    <th>Address</th>
+    <td>{{ user.address }}</td>
+  </tr>
+  <tr>
+    <th>KTH account</th>
+    <td>{{ user.kth_account }}</td>
+  </tr>
+  <tr>
+    <th>Card number</th>
+    <td>{{ user.keycard_number }}</td>
+  </tr>
+  <tr>
+    <th>Date Joined</th>
+    <td>{{ user.date_joined }}</td>
+  </tr>
+</table>
+
 <p>Här är det tänkt att man ska kunna hantera tjänstekonton för
   stacken.</p>
 

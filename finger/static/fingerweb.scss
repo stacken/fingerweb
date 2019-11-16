@@ -62,6 +62,25 @@ body {
 		color: #79aec8;
 		text-decoration: none;
 	}
+
+	table.usertable {
+		border-collapse: collapse;
+		width: 100%;
+		th, td {
+			border: 1px solid black;
+			padding: 0.6em;
+		}
+
+		th {
+			text-align: center;
+			background: $red;
+			color: white;
+		}
+
+		td {
+			text-align: right;
+		}
+	}
 }
 
 form {

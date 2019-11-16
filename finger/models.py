@@ -3,6 +3,7 @@ from django.contrib.auth.models import UserManager as AuthUserManager
 from django.db import models
 import re
 from dateutil import parser
+from datetime import datetime
 
 class UserManager(AuthUserManager):
     def update_data(self, data):
@@ -92,3 +93,73 @@ class User(AbstractUser):
     date_parted = models.DateTimeField(null=True, blank=True, verbose_name="Date parted", help_text="The date of when a member left the club.")
 
     objects = UserManager()
+
+    def is_member(self):
+        """
+        Return status if the user is considered an active member. If the user as
+        a parted date, is not active or has not payed or verified THS membership
+        this year, consider the user not a member.
+        """
+
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member() == this_year:
+            return True
+        else:
+            return False
+
+    def is_account_disabled(self):
+        """
+        Like is_member, but give the user one extra year before the account is
+        disabled. This is nice and it makes the transision periodes like new
+        year easier to manage.
+        """
+
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member() < this_year - 1:
+            return True
+        else:
+            return False
+
+    def is_account_delete(self):
+        """
+        Like is_account_disabled, but 5 years instead of 1. This is used to figure
+        out what accounts we should remove.
+        """
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member() < this_year - 5:
+            return True
+        else:
+            return False
+
+    def has_parted(self):
+        """
+        Checks if the user has parted or not from the club.
+        TODO: Also check that the date is in the past
+        """
+        return self.date_parted or not self.is_active
+
+
+    def last_member(self):
+        """
+        Calculate last time this member was a member. Return a nice year from the
+        middle ages if the information is missing in the database. Honorary members
+        do not need to pay a member fee so they are considered members until they
+        leave.
+        """
+        if self.honorary_member:
+            return str(datetime.now().year)
+
+        bucket = [1337]
+        bucket.append(self.payed_year)
+        bucket.append(self.ths_claimed_ht)
+        bucket.append(self.ths_claimed_vt)
+        return str(max([b for b in bucket if b]))
