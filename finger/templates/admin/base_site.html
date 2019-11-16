@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% load compile_static static finger %}
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "fingerweb-admin.scss"|compile %}" />
+{% endblock %}
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Stacken Fingerweb Admin</a></h1>
+{% endblock %}
