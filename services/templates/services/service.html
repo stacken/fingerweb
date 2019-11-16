@@ -4,10 +4,12 @@
 {% block content %}
 <h1>Tjänsten {{service}}</h1>
 
-{{service.description_html |safe}}
-
 {% if has_account %}
-<p>{{user}} has an account for this service.</p>
+<p>
+  You have an account for this service. If you recently activated it, or
+  changed the password give it a minute or two to provision the needed
+  systems.
+</p>
 {% if secret %}
 <p class="pwd">Your password is <code>{{secret}}</code>. </p>
 <script type="text/javascript">
@@ -46,9 +48,15 @@
   <button name="action" value="generate">Reset password</button>
 </form>
 {% else %}
-<p>You don't have a password for this service yet.</p>
+<p>
+  This service is not yet activated for your account. Press the button below to
+  activate it.
+</p>
 <form method="post">{% csrf_token %}
-  <button name="action" value="generate">Generate a password</button>
+  <button name="action" value="generate">Activate account</button>
 </form>
 {% endif %}
+
+{{service.description_html |safe}}
+
 {% endblock %}
