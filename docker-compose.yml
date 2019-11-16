@@ -1,0 +1,22 @@
+---
+
+version: '3'
+services:
+  fingerweb:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SECRET_KEY=none
+      - ALLOWED_HOSTS=127.0.0.1,localhost
+      - DATABASE_URL=psql://postgres:dbpassword@fingerwebdb:5432/fingerweb
+      - DEBUG=True
+      - DJANGOADMIN_PASSWORD=password
+    links:
+      - fingerwebdb
+  fingerwebdb:
+    image: postgres:10
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=fingerweb
+      - POSTGRES_PASSWORD=dbpassword

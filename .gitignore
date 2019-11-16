@@ -5,3 +5,4 @@ __pycache__
 /finger/static/.sass-cache/
 /static/
 /.env
+/.vscode
