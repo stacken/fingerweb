@@ -3,8 +3,9 @@
   <head>
     <title>{% block title %}Fingerweb{% endblock %} - Stacken</title>
     <link rel="stylesheet" href="{% static "fingerweb.scss"|compile %}" />
+    {% block extrastyle %}{% endblock %}
   </head>
-  <body>
+  <body{% block bodyextra %}{% endblock %}>
     <header>
       <a href="/">Stacken Fingerweb</a>
       {% if user.is_superuser %}
