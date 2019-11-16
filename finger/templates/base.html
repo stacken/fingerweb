@@ -7,9 +7,12 @@
   <body>
     <header>
       <a href="/">Stacken member-site</a>
-      {% if user.is_authenticated %}
+      {% if user.is_superuser %}
       <span class="user">
-	{{user}} (<a href="/accounts/logout/">log out</a>)
+	      <a href="/admin/">Admin</a> &bull;
+      {% endif %}
+      {% if user.is_authenticated %}
+	      {{user}} (<a href="/accounts/logout/">log out</a>)
       </span>
       {% endif %}
     </header>
