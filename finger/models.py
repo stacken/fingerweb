@@ -105,7 +105,7 @@ class User(AbstractUser):
             return False
 
         this_year = datetime.now().year
-        if self.last_member() == this_year:
+        if self.last_member(format=2) == this_year:
             return True
         else:
             return False
@@ -121,7 +121,7 @@ class User(AbstractUser):
             return False
 
         this_year = datetime.now().year
-        if self.last_member() < this_year - 1:
+        if self.last_member(format=2) < this_year - 1:
             return True
         else:
             return False
@@ -135,7 +135,7 @@ class User(AbstractUser):
             return False
 
         this_year = datetime.now().year
-        if self.last_member() < this_year - 5:
+        if self.last_member(format=2) < this_year - 5:
             return True
         else:
             return False
@@ -148,7 +148,7 @@ class User(AbstractUser):
         return self.date_parted or not self.is_active
 
 
-    def last_member(self):
+    def last_member(self, format=1):
         """
         Calculate last time this member was a member. Return a nice year from the
         middle ages if the information is missing in the database. Honorary members
@@ -162,4 +162,8 @@ class User(AbstractUser):
         bucket.append(self.payed_year)
         bucket.append(self.ths_claimed_ht)
         bucket.append(self.ths_claimed_vt)
-        return str(max([b for b in bucket if b]))
+
+        r = max([b for b in bucket if b])
+        if format == 2:
+            return r
+        return str(r)
