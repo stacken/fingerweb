@@ -9,7 +9,7 @@ for some other web apps.
 There is an included `docker-compose.yml` that should get you started.
 This setup is somewhat similar to the production build.
 
-Type `docker-compose up` to start the containers.
+Type `docker-compose up --build` to start the containers.
 
 ### Run manage.py inside the containers
 
