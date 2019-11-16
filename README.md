@@ -19,7 +19,7 @@ This example will enter a running container and run manage.py.
 docker-compose exec fingerweb /app/manage.py makemigrations
 ```
 
-## Run django outside Docker
+## Run Django outside Docker
 
 Sometimes it can be easier to run the application directly on the host.
 
