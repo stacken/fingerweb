@@ -63,22 +63,28 @@ body {
 		text-decoration: none;
 	}
 
-	table.usertable {
+	table.usertable,
+	table.servicetable {
 		border-collapse: collapse;
 		width: 100%;
 		th, td {
-			border: 1px solid black;
+			border: 1px solid #999;
 			padding: 0.6em;
 		}
 
 		th {
 			text-align: center;
-			background: $red;
-			color: white;
 		}
 
 		td {
 			text-align: right;
+		}
+	}
+
+	table.usertable {
+		th {
+			background: $red;
+			color: white;
 		}
 	}
 }

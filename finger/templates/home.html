@@ -64,16 +64,21 @@
   </tr>
 </table>
 
-<p>Här är det tänkt att man ska kunna hantera tjänstekonton för
-  stacken.</p>
+<h2>Tjänster på Stacken</h2>
 
-<ul>
+<p>Här är en lista på tjänster på Stacken.</p>
+
+<table class="servicetable">
   {% for service in services %}
-  <li><p><a href="/services/{{service.name}}/">{{service}}</a>
-      ({{service.shortdesc}})</li>
+  <tr>
+    <th><a href="/services/{{service.name}}/">Manage {{service}}</a></th>
+    <td>{{service.shortdesc}}</td>
+  </tr>
   {% empty %}
-  <li><p>No services found, <a href="/admin/services/service/add/">create them</a>!</p></li>
+  <tr>
+    <td>No services found, <a href="/admin/services/service/add/">create them</a>!</td>
+  </tr>
   {% endfor %}
-</ul>
+</table>
 
 {% endblock %}
