@@ -19,6 +19,16 @@ This example will enter a running container and run manage.py.
 docker-compose exec fingerweb /app/manage.py makemigrations
 ```
 
+### Import data
+
+The folder `import` will be mounted to `/import` inside the container,
+so for example to import `finger.json` do this:
+
+```
+cp $FINGER_FILE import/finger.json
+docker-compose exec fingerweb /app/manage.py readjson --file /import/finger.json
+```
+
 ## Run Django outside Docker
 
 Sometimes it can be easier to run the application directly on the host.
