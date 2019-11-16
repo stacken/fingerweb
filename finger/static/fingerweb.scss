@@ -74,6 +74,8 @@ body {
 
 		th {
 			text-align: center;
+			background: $red;
+			color: white;
 		}
 
 		td {
@@ -81,10 +83,16 @@ body {
 		}
 	}
 
-	table.usertable {
+	table.servicetable {
 		th {
-			background: $red;
-			color: white;
+			a {
+				color: white;
+				display: block;
+			}
+		}
+
+		.manage-link {
+			text-align: center;
 		}
 	}
 }

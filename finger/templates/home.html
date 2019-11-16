@@ -71,8 +71,9 @@
 <table class="servicetable">
   {% for service in services %}
   <tr>
-    <th><a href="/services/{{service.name}}/">Manage {{service}}</a></th>
+    <th><a href="/services/{{service.name}}/">{{service}}</a></th>
     <td>{{service.shortdesc}}</td>
+    <td class="manage-link"><a href="/services/{{service.name}}/">Manage</a></td>
   </tr>
   {% empty %}
   <tr>
