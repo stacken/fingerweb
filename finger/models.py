@@ -144,6 +144,7 @@ class User(AbstractUser):
             return True
         else:
             return False
+    is_member.boolean = True
 
     def is_account_disabled(self):
         """
@@ -175,6 +176,28 @@ class User(AbstractUser):
         else:
             return False
 
+    def ths_claimed(self):
+        """
+        The user is a THS member
+        """
+        t = datetime.now()
+        if t.month <= 7:
+            return self.ths_claimed_vt == t.year
+        else:
+            return self.ths_claimed_ht == t.year
+    ths_claimed.boolean = True
+
+    def ths_verified(self):
+        """
+        The user is a THS verified member
+        """
+        t = datetime.now()
+        if t.month <= 7:
+            return self.ths_verified_vt == t.year
+        else:
+            return self.ths_verified_ht == t.year
+    ths_verified.boolean = True
+
     def has_parted(self):
         """
         Checks if the user has parted or not from the club.
@@ -191,7 +214,10 @@ class User(AbstractUser):
         leave.
         """
         if self.honorary_member:
-            return str(datetime.now().year)
+            if format == 2:
+                return datetime.now().year
+            else:
+                return str(datetime.now().year)
 
         bucket = [1337]
         bucket.append(self.payed_year)

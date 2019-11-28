@@ -3,46 +3,71 @@ from .models import User
 from django.db.models import Q
 from datetime import datetime, timedelta
 
-class MemberStatusListFilter(admin.SimpleListFilter):
-    title = "Members Status"
+class MemberListFilter(admin.SimpleListFilter):
+    title = "Member Status/Type"
     parameter_name = 'member_status'
 
     def lookups(self, request, model_admin):
         return (
-            ('active', "Active"),
-            ('recent', "Recent"),
+            ('active', "Active Member"),
+            ('recent', "Recent Member"),
         )
 
+    def active_member(self, request, queryset):
+        """
+        List members that we consider active. Members that have
+        payed this year, have verified their THS status the last
+        half year or are honorary members. New members that
+        joined the last year are also considered active.
+
+        Inactive accounts are filtered out, we do not look at the
+        date_parted field because we assume is_active should be
+        false for these users.
+        """
+        t = datetime.now()
+
+        if t.month <= 7:
+            ths_member_claimed = Q(ths_claimed_vt__gte=t.year)
+        else:
+            ths_member_claimed = Q(ths_claimed_ht__gte=t.year)
+
+        return queryset.filter(
+            Q(payed_year__gte=t.year) |
+            Q(honorary_member__exact=True) |
+            Q(date_joined__gte=t - timedelta(days=365)) |
+            ths_member_claimed
+        ).exclude(is_active__exact=False)
+
+    def recent_member(self, request, queryset):
+        """
+        List members that recently where members. Members that
+        has a parted date and are active will be filtered out.
+        """
+        t = datetime.now() - timedelta(days=2*365)
+
+        return queryset.filter(
+            Q(payed_year__gte=t.year) |
+            Q(ths_claimed_vt__gte=t.year) |
+            Q(ths_claimed_ht__gte=t.year)
+        ).exclude(date_parted__lte=datetime.now()) \
+         .exclude(honorary_member__exact=True) \
+         .difference(self.active_member(request, queryset))
+
     def queryset(self, request, queryset):
-        if self.value() == 'active' or self.value() == 'recent':
+        if self.value() == 'active':
+            return self.active_member(request, queryset)
+        if self.value() == 'recent':
+            return self.recent_member(request, queryset)
 
-            if self.value() == 'active':
-                t = datetime.now()
-            else:
-                t = datetime.now() - timedelta(days=2*365)
-
-            if t.month <= 7:
-                ths_member_claimed = Q(ths_claimed_vt__gte=t.year)
-            else:
-                ths_member_claimed = Q(ths_claimed_ht__gte=t.year)
-
-            # If this is "active" t will be in the future, disabling this
-            # option. If this is "recent" t is already two years ago so
-            # is_new_member will be increased to only "1 year ago".
-            is_new_member = Q(date_joined__gte=t + timedelta(days=365))
-
-            return queryset.filter(
-                Q(payed_year__gte=t.year) |
-                Q(honorary_member__exact=True) |
-                is_new_member |
-                ths_member_claimed
-            ).exclude(is_active__exact=False)
 
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ('username',
-                    'first_name',
-                    'last_name',
-                    'payed_year')
+                    'get_full_name',
+                    'last_member',
+                    'is_member',
+                    'ths_claimed',
+                    'ths_verified',
+                    'support_member')
 
     search_fields = ('username',
                      'first_name',
@@ -50,11 +75,10 @@ class StackenUserAdmin(admin.ModelAdmin):
                      'ths_name',
                      'kth_account')
 
-    list_filter = ('support_member',
+    list_filter = (MemberListFilter,
+                   'support_member',
                    'honorary_member',
-                   MemberStatusListFilter,
                    'has_key',
-                   'payed_year',
                    'is_superuser')
 
     fieldsets = (
