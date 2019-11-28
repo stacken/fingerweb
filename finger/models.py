@@ -72,7 +72,7 @@ class UserManager(AuthUserManager):
                 fields['support_member'] = user.get('stödmedlem', False)
                 fields['honorary_member'] = user.get('Hedersmedlem', False)
                 fields['keycard_number'] = user.get('kortnr')
-                date_joined_cet = "{} 00:00:00 CET".format(user.get('inträdesdatum', '1970-01-01'))
+                date_joined_cet = "{} 12:00:00 CET".format(user.get('inträdesdatum', '1970-01-01'))
                 fields['date_joined'] = parser.parse(date_joined_cet)
 
                 # These fields are mainly here to make our verifications easier. Both with new
@@ -96,7 +96,7 @@ class UserManager(AuthUserManager):
 
                 # For users that have left the club. Set a parted date and disable the user.
                 if user.get('utträdesdatum'):
-                    date_parted_cet = "{} 00:00:00 CET".format(user.get('utträdesdatum'))
+                    date_parted_cet = "{} 12:00:00 CET".format(user.get('utträdesdatum'))
                     fields['date_parted'] = parser.parse(date_parted_cet)
                     fields['is_active'] = False
                 else:
