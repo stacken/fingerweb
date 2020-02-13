@@ -3,13 +3,18 @@
   <head>
     <title>{% block title %}Fingerweb{% endblock %} - Stacken</title>
     <link rel="stylesheet" href="{% static "fingerweb.scss"|compile %}" />
+    {% block extrastyle %}{% endblock %}
   </head>
-  <body>
+  <body{% block bodyextra %}{% endblock %}>
     <header>
-      <a href="/">Stacken member-site</a>
-      {% if user.is_authenticated %}
+      <a href="/">Stacken Fingerweb</a>
+      {% if user.is_superuser %}
       <span class="user">
-	{{user}} (<a href="/accounts/logout/">log out</a>)
+        <a href="/admin/">Admin</a> &bull;
+        <a href="/admin/finger/user/">Members</a> &bull;
+      {% endif %}
+      {% if user.is_authenticated %}
+	      {{user}} (<a href="/accounts/logout/">log out</a>)
       </span>
       {% endif %}
     </header>

@@ -1,0 +1,22 @@
+$red: #ad0000;
+$darkred: #840000;
+
+#header {
+    background: $red;
+    color: white;
+}
+
+html body div#container div.breadcrumbs {
+    background: $darkred;
+    color: white;
+}
+
+html body.dashboard div#container div#content div#content-main div table caption,
+html body div#container div#content div#content-main form div fieldset.module.aligned h2,
+html body div#container div#content.flex div#content-main div#changelist.module.filtered div#changelist-filter h2 {
+    background: $red;
+}
+
+html body div#container div#header div#branding h1#site-name a {
+    color: white;
+}

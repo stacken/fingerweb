@@ -4,65 +4,44 @@ A web app that might replace finger.{txt,json}.
 The first usefull thing it might do is handle service-specific passwords
 for some other web apps.
 
-## Local Docker build
+## How to run it with Docker
 
-Possible you need to append sudo in front of `docker`, or become a member of the docker group.
+There is an included `docker-compose.yml` that should get you started.
+This setup is somewhat similar to the production build.
 
-Build a image called fingerweb:
+Type `docker-compose up --build` to start the containers.
 
-`$ docker build -t fingerweb .`
+### Run manage.py inside the containers
 
-Run the image, append the environment and map the port to the host:
-
-```
-$ docker run -ti \
-  -e SECRET_KEY=none \
-  -e ALLOWED_HOSTS=127.0.0.1,localhost \
-  -e DATABASE_URL=sqlite:///db.sqlite3 \
-  -e DEBUG=True \
-  -e DJANGOADMIN_PASSWORD=password \
-  -p 8080:8080 \
-  fingerweb
-```
-
-With this you will end up with a clean environment, every time. If you like to keep
-the database between runs, I recommend that you spins up a separate database container
-and link then together, for example:
+This example will enter a running container and run manage.py.
 
 ```
-$ docker run -d \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_DB=fingerweb \
-  -e POSTGRES_PASSWORD=dbpassword \
-  --name fingerwebdb \
-  postgres:10
-$ docker run -ti \
-  --link fingerwebdb \
-  -e SECRET_KEY=none \
-  -e ALLOWED_HOSTS=127.0.0.1,localhost \
-  -e DATABASE_URL=psql://postgres:dbpassword@fingerwebdb:5432/fingerweb \
-  -e DEBUG=True \
-  -e DJANGOADMIN_PASSWORD=password \
-  -p 8080:8080 \
-  fingerweb
+docker-compose exec fingerweb /app/manage.py makemigrations
 ```
 
-## manage.py
+### Import data
 
-This example will volume mount in the project files to the container. New migrations
-are then created.
+The folder `import` will be mounted to `/import` inside the container,
+so for example to import `finger.json` do this:
 
 ```
-$ docker run -ti \
-  --link fingerwebdb \
-  -e SECRET_KEY=none \
-  -e ALLOWED_HOSTS=127.0.0.1,localhost \
-  -e DATABASE_URL=psql://postgres:dbpassword@fingerwebdb:5432/fingerweb \
-  -e DEBUG=True \
-  -v $PWD:/app \
-  -e DJANGOADMIN_PASSWORD=password \
-  fingerweb \
-  /app/manage.py makemigrations
+cp $FINGER_FILE import/finger.json
+docker-compose exec fingerweb /app/manage.py readjson --file /import/finger.json
+```
+
+## Run Django outside Docker
+
+Sometimes it can be easier to run the application directly on the host.
+
+```
+virtualenv -p python3 .env
+. .env/bin/activate
+export SECRET_KEY=none
+export ALLOWED_HOSTS=127.0.0.1,localhost
+export DEBUG=True
+export DATABASE_URL=sqlite:///db.sqlite3
+export DJANGOADMIN_PASSWORD=password
+./manage.py
 ```
 
 ## Production build

@@ -3,75 +3,116 @@ from django.contrib.auth.models import UserManager as AuthUserManager
 from django.db import models
 import re
 from dateutil import parser
+from datetime import datetime
 
 class UserManager(AuthUserManager):
+
+    def is_valid_user(self, user):
+        username = user.get('användarnamn')
+        return username and re.match('^[a-z]+$', username) and username != 'stacken'
+
+    def list_to_str(self, the_list):
+        return ", ".join(filter(None, the_list))
+
     def update_data(self, data):
         """
         Take an iterable of user data (the result of parsing finger.json),
         and create and/or update users accordingly.
         """
-        for entry in data:
-            username = entry.get('användarnamn')
-            if username and re.match('^[a-z]+$', username) and username != 'stacken':
 
-                phone_list = [entry.get('arbtelefon'),
-                              entry.get('hemtelefon')]
+        for user in data:
+            if self.is_valid_user(user):
+                fields = {}
 
-                comments_list = [entry.get('avdelning'),
-                                 entry.get('distrubution'),
-                                 entry.get('organisation'),
-                                 entry.get('status'),
-                                 entry.get('syssel'),
-                                 entry.get('comment')]
-                if entry.get('Utesluten'):
-                    comments_list = ["Utesluten"] + comments_list
+                # I see no point to keep _both_ values in separate fields. No script
+                # uses them, they are only for human consumption. Make the list unique.
+                fields['phone'] = self.list_to_str(
+                    list(set([user.get('arbtelefon'), user.get('hemtelefon')]))
+                )
 
-                if not entry.get('Fel_adress'):
-                    address_list = [entry.get('gatuadress'),
-                                    entry.get('postadress'),
-                                    entry.get('land')]
-                    if entry.get('c/o'):
-                        address_list = ["c/o " + entry.get('c/o')] + address_list
+                # Various information in the commens field, this contains possible
+                # useful infomation for the future. But it's intended for human
+                # consumption and the information is not that usable these days.
+                fields['comments'] = self.list_to_str(
+                    [
+                        user.get('avdelning'),
+                        user.get('distrubution'),
+                        user.get('organisation'),
+                        user.get('status'),
+                        user.get('syssel'),
+                        user.get('comment'),
+                        "Medlemmen är utesluten" if user.get('Utesluten') else ""
+                    ]
+                )
+
+                # Unless we have noted the address as incorrect, add the information
+                # to the address field.
+                if not user.get('Fel_adress'):
+                    fields['address'] = self.list_to_str(
+                        [
+                            "c/o " + user.get('c/o') if user.get('c/o') else "",
+                            user.get('gatuadress'),
+                            user.get('postadress'),
+                            user.get('land')
+                        ]
+                    )
+
+                # Because the user can choose to pay only for half the year we need to
+                # verify THS members twice a year. In the old system we only noted what
+                # year we checked the membership status.
+                fields['ths_claimed_vt'] = user.get('THS-studerande')
+                fields['ths_claimed_ht'] = user.get('THS-studerande')
+
+                # Various simple fields that do not need that much comments...
+                fields['title'] = user.get('titel')
+                fields['first_name'] = user.get('förnamn')
+                fields['last_name'] = user.get('efternamn')
+                fields['payed_year'] = user.get('betalt')
+                fields['has_key'] = user.get('Hallnyckel', False)
+                fields['support_member'] = user.get('stödmedlem', False)
+                fields['honorary_member'] = user.get('Hedersmedlem', False)
+                fields['keycard_number'] = user.get('kortnr')
+                fields['date_joined'] = parse_date(user.get('inträdesdatum', '1970-01-01'))
+
+                # These fields are mainly here to make our verifications easier. Both with new
+                # members but also when we talk with THS. The field ths_name is intended to be
+                # used insted of first_ and last_name when we talk with THS. This can be useful
+                # if the name in Stackens systems does not match what THS has on file.
+                fields['ths_name'] = user.get('THS-namn')
+                fields['kth_account'] = user.get('KTH-konto')
+
+                # For users that do not have an email address try to construct one with the
+                # information we have on file.
+                if user.get('mailadress'):
+                    fields['email'] = user.get('mailadress')
                 else:
-                    address_list = []
-
-                fields = {
-                    'title': entry.get('titel'),
-                    'first_name': entry.get('förnamn'),
-                    'last_name': entry.get('efternamn'),
-                    'email': entry.get('mailadress'),
-                    'payed_year': entry.get('betalt'),
-                    'ths_claimed_vt': entry.get('THS-studerande'),
-                    'ths_claimed_ht': entry.get('THS-studerande'),
-                    'phone': ", ".join(filter(None, phone_list)),
-                    'comments': "\n".join(filter(None, comments_list)),
-                    'address': "\n".join(filter(None, address_list)),
-                    'ths_name': entry.get('THS-namn'),
-                    'kth_account': entry.get('KTH-konto'),
-                    'has_key': entry.get('Hallnyckel', False),
-                    'support_member': entry.get('stödmedlem', False),
-                    'honorary_member': entry.get('Hedersmedlem', False),
-                    'keycard_number': entry.get('kortnr'),
-                    'date_joined': parser.parse(entry.get('inträdesdatum', '1970-01-01')),
-                }
-                if not fields.get('email'):
-                    kthname = entry.get('KTH-konto')
+                    kthname = user.get('KTH-konto')
+                    username = user.get('användarnamn')
                     if kthname:
                         fields['email'] = kthname + '@kth.se'
                     else:
                         fields['email'] = username + '@stacken.kth.se'
 
-                if entry.get('utträdesdatum'):
-                    fields['date_parted'] = parser.parse(entry.get('utträdesdatum'))
+                # For users that have left the club. Set a parted date and disable the user.
+                if user.get('utträdesdatum'):
+                    fields['date_parted'] = parse_date(user.get('utträdesdatum'))
                     fields['is_active'] = False
                 else:
                     fields['date_parted'] = None
-
-                if entry.get('Utesluten') or entry.get('Slutat'):
+                
+                # Disable users that have have parted
+                if user.get('Utesluten') or user.get('Slutat'):
                     fields['is_active'] = False
 
-                user, created = self.update_or_create(username=username,
+                user, created = self.update_or_create(username=user.get('användarnamn'),
                                                       defaults=fields)
+
+def parse_date(datestr):
+    if datestr:
+        return parser.parse("%s 12:00:00 CET" % datestr)
+    else:
+        return None
+
 
 class User(AbstractUser):
     payed_year = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Payed Year", help_text="The year the member has valid payed membership to.")
@@ -92,3 +133,103 @@ class User(AbstractUser):
     date_parted = models.DateTimeField(null=True, blank=True, verbose_name="Date parted", help_text="The date of when a member left the club.")
 
     objects = UserManager()
+
+    def is_member(self):
+        """
+        Return status if the user is considered an active member. If the user as
+        a parted date, is not active or has not payed or verified THS membership
+        this year, consider the user not a member.
+        """
+
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member(format=2) == this_year:
+            return True
+        else:
+            return False
+    is_member.boolean = True
+
+    def is_account_disabled(self):
+        """
+        Like is_member, but give the user one extra year before the account is
+        disabled. This is nice and it makes the transision periodes like new
+        year easier to manage.
+        """
+
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member(format=2) < this_year - 1:
+            return True
+        else:
+            return False
+
+    def is_account_delete(self):
+        """
+        Like is_account_disabled, but 5 years instead of 1. This is used to figure
+        out what accounts we should remove.
+        """
+        if self.has_parted():
+            return False
+
+        this_year = datetime.now().year
+        if self.last_member(format=2) < this_year - 5:
+            return True
+        else:
+            return False
+
+    def ths_claimed(self):
+        """
+        The user is a THS member
+        """
+        t = datetime.now()
+        if t.month <= 7:
+            return self.ths_claimed_vt == t.year
+        else:
+            return self.ths_claimed_ht == t.year
+    ths_claimed.boolean = True
+
+    def ths_verified(self):
+        """
+        The user is a THS verified member
+        """
+        t = datetime.now()
+        if t.month <= 7:
+            return self.ths_verified_vt == t.year
+        else:
+            return self.ths_verified_ht == t.year
+    ths_verified.boolean = True
+
+    def has_parted(self):
+        """
+        Checks if the user has parted or not from the club.
+        TODO: Also check that the date is in the past
+        """
+        return self.date_parted or not self.is_active
+
+
+    def last_member(self, format=1):
+        """
+        Calculate last time this member was a member. Return a nice year from the
+        middle ages if the information is missing in the database. Honorary members
+        do not need to pay a member fee so they are considered members until they
+        leave.
+        """
+        if self.honorary_member:
+            if format == 2:
+                return datetime.now().year
+            else:
+                return str(datetime.now().year)
+
+        bucket = [1337]
+        bucket.append(self.payed_year)
+        bucket.append(self.ths_claimed_ht)
+        bucket.append(self.ths_claimed_vt)
+
+        r = max([b for b in bucket if b])
+        if format == 2:
+            return r
+        return str(r)

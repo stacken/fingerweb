@@ -3,16 +3,83 @@
 {% block content %}
 <h1>Välkommen {{user.get_full_name}}</h1>
 
-<p>Här är det tänkt att man ska kunna hantera tjänstekonton för
-  stacken.</p>
+<p>
+  Här kan du se data vi har om dig. Du kan läsa mer om vår
+  <a href="https://www.stacken.kth.se/club/integritetspolicy/">integritetspolicy</a>
+  på vår hemsida. Vill du ha någon information ändrad vad god och kontakta
+  <a href="https://www.stacken.kth.se/club/">styrelsen</a>. Inaktiva konton kommer bli
+  först inaktiverade, och sen borttagna.
+</p>
 
-<ul>
+{% if not user.is_member %}
+<p>
+  Varning! Du är inte noterad som medlem sedan {{ user.last_member }}. Vi kommer snart
+  stänga och sedan ta bort ditt konto. Kontakta styrelsen om du fortfarande vill vara
+  medlem.
+</p>
+{% endif %}
+
+<table class="usertable">
+  <tr>
+    <th>User</th>
+    <td>{{ user.username }}</td>
+  </tr>
+  <tr>
+    <th>Name</th>
+    <td>{{ user.get_full_name }}</td>
+  </tr>
+  <tr>
+    <th>Email address</th>
+    <td>{{ user.email }}</td>
+  </tr>
+  <tr>
+    <th>Member status</th>
+    <td>
+      {% if user.is_member %}
+        Active member
+      {% else %}
+        Inactive member
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th>Phone</th>
+    <td>{{ user.phone }}</td>
+  </tr>
+  <tr>
+    <th>Address</th>
+    <td>{{ user.address }}</td>
+  </tr>
+  <tr>
+    <th>KTH account</th>
+    <td>{{ user.kth_account }}</td>
+  </tr>
+  <tr>
+    <th>Card number</th>
+    <td>{{ user.keycard_number }}</td>
+  </tr>
+  <tr>
+    <th>Date Joined</th>
+    <td>{{ user.date_joined }}</td>
+  </tr>
+</table>
+
+<h2>Tjänster på Stacken</h2>
+
+<p>Här är en lista på tjänster på Stacken som du kan skapa ett konto på.</p>
+
+<table class="servicetable">
   {% for service in services %}
-  <li><p><a href="/services/{{service.name}}/">{{service}}</a>
-      ({{service.shortdesc}})</li>
+  <tr>
+    <th><a href="/services/{{service.name}}/">{{service}}</a></th>
+    <td>{{service.shortdesc}}</td>
+    <td class="manage-link"><a href="/services/{{service.name}}/">Manage</a></td>
+  </tr>
   {% empty %}
-  <li><p>No services found, <a href="/admin/services/service/add/">create them</a>!</p></li>
+  <tr>
+    <td>No services found, <a href="/admin/services/service/add/">create them</a>!</td>
+  </tr>
   {% endfor %}
-</ul>
+</table>
 
 {% endblock %}

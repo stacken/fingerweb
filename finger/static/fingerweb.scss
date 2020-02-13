@@ -1,5 +1,7 @@
 $red: #ad0000;
 
+@import url(admin/fonts.css);
+
 html, body {
     margin: 0;
     padding: 0;
@@ -8,8 +10,12 @@ html, body {
 }
 
 body {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     background: white;
-    color: #321;
+    color: #333;
     display: flex;
     flex-flow: column;
 
@@ -50,7 +56,45 @@ body {
 	width: fill-available;
 	max-width: 50em;
 	margin: auto;
-    }
+	}
+	
+	a {
+		color: #79aec8;
+		text-decoration: none;
+	}
+
+	table.usertable,
+	table.servicetable {
+		border-collapse: collapse;
+		width: 100%;
+		th, td {
+			border: 1px solid #999;
+			padding: 0.6em;
+		}
+
+		th {
+			text-align: center;
+			background: $red;
+			color: white;
+		}
+
+		td {
+			text-align: right;
+		}
+	}
+
+	table.servicetable {
+		th {
+			a {
+				color: white;
+				display: block;
+			}
+		}
+
+		.manage-link {
+			text-align: center;
+		}
+	}
 }
 
 form {
