@@ -72,8 +72,7 @@ class UserManager(AuthUserManager):
                 fields['support_member'] = user.get('stödmedlem', False)
                 fields['honorary_member'] = user.get('Hedersmedlem', False)
                 fields['keycard_number'] = user.get('kortnr')
-                date_joined_cet = "{} 12:00:00 CET".format(user.get('inträdesdatum', '1970-01-01'))
-                fields['date_joined'] = parser.parse(date_joined_cet)
+                fields['date_joined'] = parse_date(user.get('inträdesdatum', '1970-01-01'))
 
                 # These fields are mainly here to make our verifications easier. Both with new
                 # members but also when we talk with THS. The field ths_name is intended to be
@@ -96,8 +95,7 @@ class UserManager(AuthUserManager):
 
                 # For users that have left the club. Set a parted date and disable the user.
                 if user.get('utträdesdatum'):
-                    date_parted_cet = "{} 12:00:00 CET".format(user.get('utträdesdatum'))
-                    fields['date_parted'] = parser.parse(date_parted_cet)
+                    fields['date_parted'] = parse_date(user.get('utträdesdatum'))
                     fields['is_active'] = False
                 else:
                     fields['date_parted'] = None
@@ -108,6 +106,13 @@ class UserManager(AuthUserManager):
 
                 user, created = self.update_or_create(username=user.get('användarnamn'),
                                                       defaults=fields)
+
+def parse_date(datestr):
+    if datestr:
+        return parser.parse("%s 12:00:00 CET" % datestr)
+    else:
+        return None
+
 
 class User(AbstractUser):
     payed_year = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Payed Year", help_text="The year the member has valid payed membership to.")
