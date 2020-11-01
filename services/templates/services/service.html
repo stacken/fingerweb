@@ -4,6 +4,10 @@
 {% block content %}
 <h1>Tjänsten {{service}}</h1>
 
+<p>
+  {{ service.shortdesc }}
+</p>
+
 {% if has_account %}
 <p>
   You have an account for this service. If you recently activated it, or
