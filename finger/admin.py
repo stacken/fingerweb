@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.core import serializers
 from django.http import HttpResponse
 from datetime import datetime, timedelta
+import csv
 
 class MemberListFilter(admin.SimpleListFilter):
     title = "Member Status/Type"
@@ -96,6 +97,26 @@ def export_json(modeladmin, request, queryset):
     return response
 export_json.short_description = "Export as JSON"
 
+
+def export_kortexp(modeladmin, request, queryset):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename=users.csv'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'E-post', 'KTH-ID', 'Kortnummer', 'Expireringsdatum'])
+    for user in queryset:
+        next_year = datetime.now().year + 1
+        writer.writerow([
+            f"{user.first_name} {user.last_name}",
+            user.email,
+            user.kth_account,
+            user.keycard_number,
+            f"{next_year}-03-01 10:15"
+        ])
+
+    return response
+export_kortexp.short_description = "Export as CSV for kortexp"
+
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ('username',
                     'get_full_name',
@@ -118,7 +139,8 @@ class StackenUserAdmin(admin.ModelAdmin):
                    'has_key',
                    'is_superuser')
 
-    actions = [export_json]
+    actions = (export_json,
+               export_kortexp)
 
     fieldsets = (
         (None, {
