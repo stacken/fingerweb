@@ -83,6 +83,12 @@ class UserManager(AuthUserManager):
                 fields['ths_name'] = user.get('THS-namn')
                 fields['kth_account'] = user.get('KTH-konto')
 
+                # If the user has a kth.se-email address, assume the user part is the KTH account name
+                if user.get('mailadress') and "@" in user.get('mailadress') and not user.get('KTH-konto'):
+                    email_fields = user.get('mailadress').split("@")
+                    if email_fields[1] == "kth.se":
+                        fields['kth_account'] = email_fields[0]
+
                 # For users that do not have an email address try to construct one with the
                 # information we have on file.
                 if user.get('mailadress'):
