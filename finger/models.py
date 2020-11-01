@@ -9,10 +9,16 @@ class UserManager(AuthUserManager):
 
     def is_valid_user(self, user):
         username = user.get('användarnamn')
-        return username and re.match('^[a-z]+$', username) and username != 'stacken'
+        return username and re.match(r'^\(?[a-z]+\)?$', username) and username != 'stacken'
 
     def list_to_str(self, the_list):
         return ", ".join(filter(None, the_list))
+
+    def clean_username(self, username):
+        return username.replace('(','').replace(')', '').lower()
+
+    def has_signed_contract(self, username):
+        return not '(' in username
 
     def update_data(self, data):
         """
@@ -95,7 +101,7 @@ class UserManager(AuthUserManager):
                     fields['email'] = user.get('mailadress')
                 else:
                     kthname = user.get('KTH-konto')
-                    username = user.get('användarnamn')
+                    username = self.clean_username(user.get('användarnamn'))
                     if kthname:
                         fields['email'] = kthname + '@kth.se'
                     else:
@@ -112,7 +118,13 @@ class UserManager(AuthUserManager):
                 if user.get('Utesluten') or user.get('Slutat'):
                     fields['is_active'] = False
 
-                user, created = self.update_or_create(username=user.get('användarnamn'),
+                # Disable users that have not yet signed the contract
+                # This is defined with parentheses sround the username in
+                # finger.json
+                if not self.has_signed_contract(user.get('användarnamn')):
+                    fields['is_active'] = False
+
+                user, created = self.update_or_create(username=self.clean_username(user.get('användarnamn')),
                                                       defaults=fields)
 
 def parse_date(datestr):
@@ -216,7 +228,7 @@ class User(AbstractUser):
         Checks if the user has parted or not from the club.
         TODO: Also check that the date is in the past
         """
-        return self.date_parted or not self.is_active
+        return self.date_parted
 
 
     def last_member(self, format=1):

@@ -39,7 +39,7 @@ class MemberListFilter(admin.SimpleListFilter):
             Q(honorary_member__exact=True) |
             Q(date_joined__gte=t - timedelta(days=365)) |
             ths_member_claimed
-        ).exclude(is_active__exact=False)
+        )
 
     def recent_member(self, request, queryset):
         """
@@ -151,7 +151,8 @@ class StackenUserAdmin(admin.ModelAdmin):
                     'is_member',
                     'ths_claimed',
                     'ths_verified',
-                    'support_member')
+                    'support_member',
+                    'is_active')
 
     search_fields = ('username',
                      'first_name',
