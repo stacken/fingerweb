@@ -117,6 +117,33 @@ def export_kortexp(modeladmin, request, queryset):
     return response
 export_kortexp.short_description = "Export as CSV for kortexp"
 
+
+def export_ths(modeladmin, request, queryset):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename=users.csv'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'E-post'])
+    user_number = 1
+    for user in queryset:
+        user_name = f"{user.first_name} {user.last_name}" if not user.ths_name else user.ths_name
+        user_email = user.email if not user.kth_account else f"{user.kth_account}@kth.se"
+        if not user_email:
+            user_email = f"{user.username}@stacken.kth.se"
+
+        # Anonymize non-THS users, we use the claimed field so make sure
+        # that one is up to date before this script is executed!
+        if user.ths_claimed():
+            writer.writerow([user_name, user_email])
+        else:
+            writer.writerow([f"Stacken User {user_number}", f"not-ths-member@stacken.kth.se"])
+
+        user_number += 1
+
+    return response
+export_ths.short_description = "Export as CSV for THS"
+
+
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ('username',
                     'get_full_name',
@@ -140,7 +167,8 @@ class StackenUserAdmin(admin.ModelAdmin):
                    'is_superuser')
 
     actions = (export_json,
-               export_kortexp)
+               export_kortexp,
+               export_ths)
 
     fieldsets = (
         (None, {
