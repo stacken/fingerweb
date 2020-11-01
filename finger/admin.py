@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import User
 from django.db.models import Q
+from django.core import serializers
+from django.http import HttpResponse
 from datetime import datetime, timedelta
 
 class MemberListFilter(admin.SimpleListFilter):
@@ -87,6 +89,13 @@ class MemberTHSStatus(admin.SimpleListFilter):
             else:
                 return queryset.filter(Q(ths_verified_ht__exact=t.year))
 
+def export_json(modeladmin, request, queryset):
+    response = HttpResponse(content_type="application/json")
+    serializers.serialize("json", queryset, stream=response)
+    response['Content-Disposition'] = 'attachment; filename=users.json'
+    return response
+export_json.short_description = "Export as JSON"
+
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ('username',
                     'get_full_name',
@@ -108,6 +117,8 @@ class StackenUserAdmin(admin.ModelAdmin):
                    MemberTHSStatus,
                    'has_key',
                    'is_superuser')
+
+    actions = [export_json]
 
     fieldsets = (
         (None, {
