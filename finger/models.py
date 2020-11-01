@@ -153,7 +153,7 @@ class User(AbstractUser):
             return False
 
         this_year = datetime.now().year
-        if self.last_member(format=2) == this_year:
+        if self.last_member(format=2) >= this_year:
             return True
         else:
             return False
