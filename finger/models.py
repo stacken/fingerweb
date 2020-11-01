@@ -60,8 +60,10 @@ class UserManager(AuthUserManager):
                 # Because the user can choose to pay only for half the year we need to
                 # verify THS members twice a year. In the old system we only noted what
                 # year we checked the membership status.
-                fields['ths_claimed_vt'] = user.get('THS-studerande')
-                fields['ths_claimed_ht'] = user.get('THS-studerande')
+                if datetime.now().month <= 7:
+                    fields['ths_claimed_vt'] = user.get('THS-studerande')
+                else:
+                    fields['ths_claimed_ht'] = user.get('THS-studerande')
 
                 # Various simple fields that do not need that much comments...
                 fields['title'] = user.get('titel')
@@ -80,6 +82,12 @@ class UserManager(AuthUserManager):
                 # if the name in Stackens systems does not match what THS has on file.
                 fields['ths_name'] = user.get('THS-namn')
                 fields['kth_account'] = user.get('KTH-konto')
+
+                # If the user has a kth.se-email address, assume the user part is the KTH account name
+                if user.get('mailadress') and "@" in user.get('mailadress') and not user.get('KTH-konto'):
+                    email_fields = user.get('mailadress').split("@")
+                    if email_fields[1] == "kth.se":
+                        fields['kth_account'] = email_fields[0]
 
                 # For users that do not have an email address try to construct one with the
                 # information we have on file.
