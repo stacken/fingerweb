@@ -60,6 +60,33 @@ class MemberListFilter(admin.SimpleListFilter):
             return self.recent_member(request, queryset)
 
 
+class MemberTHSStatus(admin.SimpleListFilter):
+    t = datetime.now()
+    is_vt = t.month <= 7
+    title = f"THS Status VT{t.year}" if is_vt else f"THS Status HT{t.year}"
+
+    parameter_name = 'ths_status'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('claimed', "Claimed"),
+            ('verified', "Verified"),
+        )
+
+    def queryset(self, request, queryset):
+        t = datetime.now()
+
+        if self.value() == 'claimed':
+            if self.is_vt:
+                return queryset.filter(Q(ths_claimed_vt__exact=t.year))
+            else:
+                return queryset.filter(Q(ths_claimed_ht__exact=t.year))
+        if self.value() == 'verified':
+            if self.is_vt:
+                return queryset.filter(Q(ths_verified_vt__exact=t.year))
+            else:
+                return queryset.filter(Q(ths_verified_ht__exact=t.year))
+
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ('username',
                     'get_full_name',
@@ -78,6 +105,7 @@ class StackenUserAdmin(admin.ModelAdmin):
     list_filter = (MemberListFilter,
                    'support_member',
                    'honorary_member',
+                   MemberTHSStatus,
                    'has_key',
                    'is_superuser')
 
