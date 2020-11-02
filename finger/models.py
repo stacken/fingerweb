@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as AuthUserManager
 from django.db import models
+from django.utils import timezone
 import re
 from dateutil import parser
 from datetime import datetime
+from datetime import timedelta
 
 class UserManager(AuthUserManager):
 
@@ -156,16 +158,16 @@ class User(AbstractUser):
 
     def is_member(self):
         """
-        Return status if the user is considered an active member. If the user as
-        a parted date, is not active or has not payed or verified THS membership
+        Return status if the user is considered an active member. If the user has
+        a parted date, has not payed or verified THS membership (unless a new member)
         this year, consider the user not a member.
         """
 
         if self.has_parted():
             return False
 
-        this_year = datetime.now().year
-        if self.last_member(format=2) >= this_year:
+        t = timezone.now()
+        if (self.last_member(format=2) >= t.year) or (t - timedelta(days=365) < self.date_joined):
             return True
         else:
             return False
@@ -238,17 +240,17 @@ class User(AbstractUser):
         do not need to pay a member fee so they are considered members until they
         leave.
         """
-        if self.honorary_member:
-            if format == 2:
-                return datetime.now().year
-            else:
-                return str(datetime.now().year)
 
         bucket = [1337]
         bucket.append(self.payed_year)
         bucket.append(self.ths_claimed_ht)
         bucket.append(self.ths_claimed_vt)
         bucket.append(self.date_joined.year)
+        if self.honorary_member:
+            if self.has_parted():
+                bucket.append(self.date_parted.year)
+            else:
+                bucket.append(timezone.now().year)
 
         r = max([b for b in bucket if b])
         if format == 2:
