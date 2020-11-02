@@ -16,6 +16,14 @@ class MemberListFilter(admin.SimpleListFilter):
             ('recent', "Recent Member"),
         )
 
+
+    def ths_member_claimed(self):
+        t = datetime.now()
+        if t.month <= 7:
+            return Q(ths_claimed_vt__gte=t.year)
+        return Q(ths_claimed_ht__gte=t.year)
+
+
     def active_member(self, request, queryset):
         """
         List members that we consider active. Members that have
@@ -29,16 +37,11 @@ class MemberListFilter(admin.SimpleListFilter):
         """
         t = datetime.now()
 
-        if t.month <= 7:
-            ths_member_claimed = Q(ths_claimed_vt__gte=t.year)
-        else:
-            ths_member_claimed = Q(ths_claimed_ht__gte=t.year)
-
         return queryset.filter(
             Q(payed_year__gte=t.year) |
             Q(honorary_member__exact=True) |
             Q(date_joined__gte=t - timedelta(days=365)) |
-            ths_member_claimed
+            self.ths_member_claimed()
         )
 
     def recent_member(self, request, queryset):
@@ -46,15 +49,18 @@ class MemberListFilter(admin.SimpleListFilter):
         List members that recently where members. Members that
         has a parted date and are active will be filtered out.
         """
-        t = datetime.now() - timedelta(days=2*365)
+        t = datetime.now()
+        t2 = datetime.now() - timedelta(days=2*365)
 
         return queryset.filter(
-            Q(payed_year__gte=t.year) |
-            Q(ths_claimed_vt__gte=t.year) |
-            Q(ths_claimed_ht__gte=t.year)
+            Q(payed_year__gte=t2.year) |
+            Q(ths_claimed_vt__gte=t2.year) |
+            Q(ths_claimed_ht__gte=t2.year)
         ).exclude(date_parted__lte=datetime.now()) \
          .exclude(honorary_member__exact=True) \
-         .difference(self.active_member(request, queryset))
+         .exclude(payed_year__gte=t.year) \
+         .exclude(date_joined__gte=t - timedelta(days=365)) \
+         .exclude(self.ths_member_claimed())
 
     def queryset(self, request, queryset):
         if self.value() == 'active':
