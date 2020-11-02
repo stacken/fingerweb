@@ -248,6 +248,7 @@ class User(AbstractUser):
         bucket.append(self.payed_year)
         bucket.append(self.ths_claimed_ht)
         bucket.append(self.ths_claimed_vt)
+        bucket.append(self.date_joined.year)
 
         r = max([b for b in bucket if b])
         if format == 2:
