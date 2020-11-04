@@ -14,6 +14,19 @@ class UploadFileForm(forms.Form):
         except:
             raise ValidationError("Must be proper json", code='badjson')
 
+class MailMembersForm(forms.Form):
+    subject = forms.CharField(label='Subject')
+    message = forms.CharField(label='Message', widget=forms.Textarea)
+    cc = forms.CharField(label='CC')
+
+    def get_members(self):
+        all_users = User.objects.all()
+
+        # Retrieving all users that are members
+        members = [user for user in all_users if user.is_member()]
+
+        return members
+
 class PasswordResetForm(ca_forms.PasswordResetForm):
     def get_users(self, email):
         """Given an email, return matching user(s) who should receive a reset.

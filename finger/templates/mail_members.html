@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Mail our members</h1>
+
+<form action="/mail_members" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table>
+  {{form.as_table}}
+ </table>
+  <p><input type="submit" value="Do it" /></p>
+</form>
+
+{% endblock %}
