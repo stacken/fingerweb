@@ -17,7 +17,7 @@ class UploadFileForm(forms.Form):
 class MailMembersForm(forms.Form):
     subject = forms.CharField(label='Subject')
     message = forms.CharField(label='Message', widget=forms.Textarea)
-    cc = forms.CharField(label='CC')
+    cc = forms.CharField(label='CC', required=False)
 
     def get_members(self):
         all_users = User.objects.all()
