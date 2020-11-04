@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import render
+from django.core.mail import send_mail
 from services.models import Service
 from .forms import PasswordResetForm, UploadFileForm, MailMembersForm
 from .models import User
@@ -32,32 +33,49 @@ def upload_json(request):
 @login_required
 def mail_members(request):
     if not (request.user.is_staff and request.user.is_superuser):
-        return HttpResponseNotAllowed()  
+        return HttpResponseNotAllowed()
 
     if request.method == 'POST':
         form = MailMembersForm(request.POST)
-        m = form.get_members()
-
-        if not request.POST.get("do_it", "") == "true":
-            context = {
-                'members' : m,
-                'form' : form,
-                'test' : True,
-            }          
-        else:
-            context = {
-                'members' : m,
-                'form' : form,
-                'test' : False,
-            }
-        
-        return render(request, 'mail_members_test.html', context)
     else:
         form = MailMembersForm()
 
+    if form.is_valid():
+        members = form.get_members()
+
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        sender = request.user.username + '@stacken.kth.se'
+
+        recipients = form.cleaned_data['recipients']
+        if recipients:
+            recipients = [("", recipient) for recipient in recipients.split(',')]
+        else:
+            # todo send to all email addresses
+            recipients = [(f"{member.first_name} {member.last_name}", member.email) for member in members]
+
+        cc = form.cleaned_data['cc']
+        if not cc:
+            cc = "styrelsen@stacken.kth.se"
+
+        context = {
+                'recipients' : recipients,
+                'form' : form,
+                'test' : True,
+        }   
+
+        if request.POST.get("do_it", "") == "true":
+            context['test'] = False
+            to = [email for (_, email) in recipients]
+            to.append(cc)
+
+            send_mail(subject, message, sender, recipients)
+
+        
+        return render(request, 'mail_members_test.html', context)
+
     return render(request, 'mail_members.html', {
         'form': form,
-        
     })
 
 class PasswordResetView(ca_views.PasswordResetView):
