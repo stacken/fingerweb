@@ -4,9 +4,13 @@
 <h1>Mail our members</h1>
 
 {% if test %}
-<h2>Not sending emails to</h2>
+  <h2>Not sending emails to</h2>
 {% else %}
-<h2> Sent emails to </h2>
+  {% if exception %}
+    <p>{{exception.0}}</p>
+    <p>{{exception.1}}</p>
+  {% endif %}
+  <h2> Sent emails to </h2>
 {% endif %}
 <ul>
 {% for name, email in recipients %}

@@ -1,12 +1,15 @@
+import sys
+
 from django.contrib.auth import views  as ca_views
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import render
-from django.core.mail import send_mail
+from django.core.mail import send_mass_mail
 from services.models import Service
 from .forms import PasswordResetForm, UploadFileForm, MailMembersForm
 from .models import User
+
 
 @login_required
 def index(request):
@@ -49,27 +52,30 @@ def mail_members(request):
 
         recipients = form.cleaned_data['recipients']
         if recipients:
-            recipients = [("", recipient) for recipient in recipients.split(',')]
+            recipients = [("", [recipient]) for recipient in recipients.split(',')]
         else:
-            # todo send to all email addresses
-            recipients = [(f"{member.first_name} {member.last_name}", member.email) for member in members]
+            recipients = [(f"{member.first_name} {member.last_name}", [member.email, f"{member.username}@stacken.kth.se" ]) for member in members]
 
-        cc = form.cleaned_data['cc']
-        if not cc:
-            cc = "styrelsen@stacken.kth.se"
+
+        extra_to = form.cleaned_data['extra_to']
+        if not extra_to:
+            extra_to = "styrelsen@stacken.kth.se"
+        recipients.append(('', [extra_to]))
 
         context = {
                 'recipients' : recipients,
                 'form' : form,
                 'test' : True,
+                'exception' : None,
         }   
 
         if request.POST.get("do_it", "") == "true":
             context['test'] = False
-            to = [email for (_, email) in recipients]
-            to.append(cc)
-
-            send_mail(subject, message, sender, recipients)
+            messages = [(subject, message, sender, email) for (_, email) in recipients]
+            try:
+                send_mass_mail(messages, fail_silently=False)
+            except:
+                context['exception'] = sys.exc_info()
 
         
         return render(request, 'mail_members_test.html', context)
