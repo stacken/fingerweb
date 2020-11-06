@@ -1,11 +1,15 @@
+import sys
+
 from django.contrib.auth import views  as ca_views
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import render
+from django.core.mail import send_mass_mail
 from services.models import Service
-from .forms import PasswordResetForm, UploadFileForm
+from .forms import PasswordResetForm, UploadFileForm, MailMembersForm
 from .models import User
+
 
 @login_required
 def index(request):
@@ -26,6 +30,57 @@ def upload_json(request):
     else:
         form = UploadFileForm()
     return render(request, 'upload_json.html', {
+        'form': form,
+    })
+
+@login_required
+def mail_members(request):
+    if not (request.user.is_staff and request.user.is_superuser):
+        return HttpResponseNotAllowed()
+
+    if request.method == 'POST':
+        form = MailMembersForm(request.POST)
+    else:
+        form = MailMembersForm()
+
+    if form.is_valid():
+        members = form.get_members()
+
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        sender = request.user.username + '@stacken.kth.se'
+
+        recipients = form.cleaned_data['recipients']
+        if recipients:
+            recipients = [("", [recipient]) for recipient in recipients.split(',')]
+        else:
+            recipients = [(f"{member.first_name} {member.last_name}", [member.email, f"{member.username}@stacken.kth.se" ]) for member in members]
+
+
+        extra_to = form.cleaned_data['extra_to']
+        if not extra_to:
+            extra_to = "styrelsen@stacken.kth.se"
+        recipients.append(('', [extra_to]))
+
+        context = {
+                'recipients' : recipients,
+                'form' : form,
+                'test' : True,
+                'exception' : None,
+        }   
+
+        if request.POST.get("do_it", "") == "true":
+            context['test'] = False
+            messages = [(subject, message, sender, email) for (_, email) in recipients]
+            try:
+                send_mass_mail(messages, fail_silently=False)
+            except:
+                context['exception'] = sys.exc_info()
+
+        
+        return render(request, 'mail_members_test.html', context)
+
+    return render(request, 'mail_members.html', {
         'form': form,
     })
 

@@ -1,4 +1,5 @@
 from django import forms
+from django.core.mail import send_mail
 from django.contrib.auth import forms as ca_forms
 from django.forms import ValidationError
 import json
@@ -13,6 +14,22 @@ class UploadFileForm(forms.Form):
             return json.load(self.cleaned_data['file'])
         except:
             raise ValidationError("Must be proper json", code='badjson')
+
+class MailMembersForm(forms.Form):
+    subject = forms.CharField(label='Subject')
+    message = forms.CharField(label='Message', widget=forms.Textarea)
+    extra_to = forms.CharField(label='Extra To', required=False)
+    recipients = forms.CharField(label='Recipients', required=False)
+
+    def get_members(self):
+        all_users = User.objects.all()
+
+        # Retrieving all users that are members
+        members = [user for user in all_users if user.is_member()]
+
+        return members
+
+
 
 class PasswordResetForm(ca_forms.PasswordResetForm):
     def get_users(self, email):

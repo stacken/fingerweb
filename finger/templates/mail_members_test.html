@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Mail our members</h1>
+
+{% if test %}
+  <h2>Not sending emails to</h2>
+{% else %}
+  {% if exception %}
+    <p>{{exception.0}}</p>
+    <p>{{exception.1}}</p>
+  {% endif %}
+  <h2> Sent emails to </h2>
+{% endif %}
+<ul>
+{% for name, email in recipients %}
+<li> {{name}} &lt;{{email}}&gt; </li>
+{% endfor %}
+</ul>
+<form action="/mail_members" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table>
+  {{form.as_table}}
+  </table>
+  <p><input type="submit" value="Do it" /></p>
+  <input type="hidden" name="do_it" value="true" />
+</form>
+
+{% endblock %}
