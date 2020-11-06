@@ -7,4 +7,3 @@ urlpatterns = [
     path('upload', views.upload_json),
     path('mail_members', views.mail_members)
 ]
-
