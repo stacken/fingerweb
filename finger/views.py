@@ -1,14 +1,15 @@
 import sys
 
-from django.contrib.auth import views  as ca_views
+from django.contrib.auth import views as ca_views
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mass_mail
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.core.mail import send_mass_mail
 from finger.decorators import staff_or_superuser_required
 from services.models import Service
-from .forms import PasswordResetForm, UploadFileForm, MailMembersForm
+
+from .forms import MailMembersForm, PasswordResetForm, UploadFileForm
 from .models import User
 
 
