@@ -1,9 +1,11 @@
 from base64 import b64decode
 from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
-from django.http import JsonResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404, render
+
 from .models import Service
 
 @login_required
