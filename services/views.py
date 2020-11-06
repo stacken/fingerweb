@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 
 from .models import Service
 
+
 @login_required
 def service(request, name):
     service = get_object_or_404(Service, name=name)
@@ -22,6 +23,7 @@ def service(request, name):
         'has_account': account and True,
         'secret': show_secret and account and account.secret,
     })
+
 
 def passwords(request, name):
     auth_user, auth_key = basic_auth(request)
@@ -41,6 +43,7 @@ def passwords(request, name):
     return JsonResponse(dict(
         query.values_list('user__username', 'secret')
     ))
+
 
 def basic_auth(request):
     auth_data = request.META.get('HTTP_AUTHORIZATION')
