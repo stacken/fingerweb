@@ -33,6 +33,11 @@ jobs:
         
       - run:
           name: run tests
+          environment:
+            SECRET_KEY: t
+            ALLOWED_HOSTS: localhost
+            DATABASE_URL: "sqlite://:memory:"
+            DEBUG: true
           command: |
             . venv/bin/activate
             pytest
