@@ -15,7 +15,7 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-{{ checksum "requirements-dev.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
@@ -24,18 +24,18 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install -q -r requirements.txt
+            pip install -q -r requirements-dev.txt
 
       - save_cache:
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          key: v1-dependencies-{{ checksum "requirements-dev.txt" }}
         
       - run:
           name: run tests
           command: |
             . venv/bin/activate
-            env SECRET_KEY=t ALLOWED_HOSTS=localhost DATABASE_URL=sqlite:///db.sqlite3 python manage.py test
+            pytest
 
       - store_artifacts:
           path: test-reports
