@@ -44,6 +44,15 @@ export DJANGOADMIN_PASSWORD=password
 ./manage.py
 ```
 
+## Run tests
+
+If you are working locally:
+
+``` python
+pip install pytest-django
+pytest
+```
+
 ## Production build
 
 A image is built and published to Docker Hub at `stacken/fingerweb:tag` where

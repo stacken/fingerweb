@@ -1,13 +1,15 @@
 import sys
 
-from django.contrib.auth import views  as ca_views
+from django.contrib.auth import views as ca_views
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponseNotAllowed
-from django.shortcuts import render
 from django.core.mail import send_mass_mail
+from django.db import transaction
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from finger.decorators import staff_or_superuser_required
 from services.models import Service
-from .forms import PasswordResetForm, UploadFileForm, MailMembersForm
+
+from .forms import MailMembersForm, PasswordResetForm, UploadFileForm
 from .models import User
 
 
@@ -17,10 +19,8 @@ def index(request):
         'services': Service.objects.all()
     })
 
-@login_required
+@staff_or_superuser_required
 def upload_json(request):
-    if not (request.user.is_staff and request.user.is_superuser):
-        return HttpResponseNotAllowed()
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -33,11 +33,8 @@ def upload_json(request):
         'form': form,
     })
 
-@login_required
+@staff_or_superuser_required
 def mail_members(request):
-    if not (request.user.is_staff and request.user.is_superuser):
-        return HttpResponseNotAllowed()
-
     if request.method == 'POST':
         form = MailMembersForm(request.POST)
     else:
