@@ -18,6 +18,7 @@ def staff_or_superuser_required(view):
         @staff_or_superuser_required
         def my_view(request): ...
     """
+
     @login_required
     @wraps(view)
     def inner(request, *args, **kwargs):
