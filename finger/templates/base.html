@@ -11,7 +11,7 @@
       {% if user.is_superuser %}
       <span class="user">
         <a href="/admin/">Admin</a> &bull;
-        <a href="/admin/finger/user/">Members</a> &bull;
+        <a href="/admin/finger/member/">Members</a> &bull;
       {% endif %}
       {% if user.is_authenticated %}
 	      {{user}} (<a href="/accounts/logout/">log out</a>)

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from optparse import make_option
-from finger.models import User
+from finger.models import Member
 import json
 
 
@@ -20,4 +20,4 @@ class Command(BaseCommand):
     def handle(self, **options):
         with open(options.get("file")) as data:
             with transaction.atomic():
-                User.objects.update_data(json.load(data))
+                Member.objects.update_data(json.load(data))

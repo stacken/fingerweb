@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import UserManager as AuthUserManager
+from django.contrib.auth.models import UserManager
 from django.db import models
 from django.utils import timezone
 import re
@@ -7,20 +7,27 @@ from dateutil import parser
 from datetime import datetime
 from datetime import timedelta
 
-
-class UserManager(AuthUserManager):
+class MemberManager(models.Manager):
     def is_valid_user(self, user):
         username = user.get("användarnamn")
-        return username and re.match(r"^\(?[a-z]+\)?$", username) and username != "stacken"
+
+        # finger.json contains some invalid data, some is fixable and some
+        # is not. We have for exampele users that has the same username
+        # registered. This will read a flag that ignores the username by
+        # invalidating the username.
+        if "username" in user.get("fingerweb_ignore", []):
+            return False
+
+        return username and re.match(r"^[a-z]+$", username) and username != "stacken"
 
     def list_to_str(self, the_list):
         return ", ".join(filter(None, the_list))
 
-    def clean_username(self, username):
-        return username.replace("(", "").replace(")", "").lower()
-
     def has_signed_contract(self, username):
-        return not "(" in username
+        if self.is_valid_user({"användarnamn": username}):
+            return not "(" in username
+        else:
+            return False
 
     def update_data(self, data):
         """
@@ -29,124 +36,126 @@ class UserManager(AuthUserManager):
         """
 
         for user in data:
-            if self.is_valid_user(user):
-                fields = {}
+            fields = {}
 
-                # I see no point to keep _both_ values in separate fields. No script
-                # uses them, they are only for human consumption. Make the list unique.
-                fields["phone"] = self.list_to_str(list(set([user.get("arbtelefon"), user.get("hemtelefon")])))
+            # I see no point to keep _both_ values in separate fields. No script
+            # uses them, they are only for human consumption. Make the list unique.
+            fields["phone"] = self.list_to_str(list(set([user.get("arbtelefon"), user.get("hemtelefon")])))
 
-                # Various information in the commens field, this contains possible
-                # useful infomation for the future. But it's intended for human
-                # consumption and the information is not that usable these days.
-                fields["comments"] = self.list_to_str(
+            # Various information in the commens field, this contains possible
+            # useful infomation for the future. But it's intended for human
+            # consumption and the information is not that usable these days.
+            fields["comments"] = self.list_to_str(
+                [
+                    user.get("avdelning"),
+                    user.get("distrubution"),
+                    user.get("organisation"),
+                    user.get("status"),
+                    user.get("syssel"),
+                    user.get("comment"),
+                    "Medlemmen är utesluten" if user.get("Utesluten") else "",
+                ]
+            )
+
+            # Unless we have noted the address as incorrect, add the information
+            # to the address field.
+            if not user.get("Fel_adress"):
+                fields["address"] = self.list_to_str(
                     [
-                        user.get("avdelning"),
-                        user.get("distrubution"),
-                        user.get("organisation"),
-                        user.get("status"),
-                        user.get("syssel"),
-                        user.get("comment"),
-                        "Medlemmen är utesluten" if user.get("Utesluten") else "",
+                        "c/o " + user.get("c/o") if user.get("c/o") else "",
+                        user.get("gatuadress"),
+                        user.get("postadress"),
+                        user.get("land"),
                     ]
                 )
 
-                # Unless we have noted the address as incorrect, add the information
-                # to the address field.
-                if not user.get("Fel_adress"):
-                    fields["address"] = self.list_to_str(
-                        [
-                            "c/o " + user.get("c/o") if user.get("c/o") else "",
-                            user.get("gatuadress"),
-                            user.get("postadress"),
-                            user.get("land"),
-                        ]
-                    )
+            # Because the user can choose to pay only for half the year we need to
+            # verify THS members twice a year. In the old system we only noted what
+            # year we checked the membership status.
+            if datetime.now().month <= 7:
+                fields["ths_claimed_vt"] = user.get("THS-studerande")
+            else:
+                fields["ths_claimed_ht"] = user.get("THS-studerande")
 
-                # Because the user can choose to pay only for half the year we need to
-                # verify THS members twice a year. In the old system we only noted what
-                # year we checked the membership status.
-                if datetime.now().month <= 7:
-                    fields["ths_claimed_vt"] = user.get("THS-studerande")
-                else:
-                    fields["ths_claimed_ht"] = user.get("THS-studerande")
+            # Various simple fields that do not need that much comments...
+            fields["title"] = user.get("titel")
+            fields["first_name"] = user.get("förnamn")
+            fields["last_name"] = user.get("efternamn")
+            fields["payed_year"] = user.get("betalt")
+            fields["has_key"] = user.get("Hallnyckel", False)
+            fields["support_member"] = user.get("stödmedlem", False)
+            fields["honorary_member"] = user.get("Hedersmedlem", False)
+            fields["keycard_number"] = user.get("kortnr")
+            fields["date_joined"] = parse_date(user.get("inträdesdatum", "1970-01-01"))
 
-                # Various simple fields that do not need that much comments...
-                fields["title"] = user.get("titel")
-                fields["first_name"] = user.get("förnamn")
-                fields["last_name"] = user.get("efternamn")
-                fields["payed_year"] = user.get("betalt")
-                fields["has_key"] = user.get("Hallnyckel", False)
-                fields["support_member"] = user.get("stödmedlem", False)
-                fields["honorary_member"] = user.get("Hedersmedlem", False)
-                fields["keycard_number"] = user.get("kortnr")
-                fields["date_joined"] = parse_date(user.get("inträdesdatum", "1970-01-01"))
+            # These fields are mainly here to make our verifications easier. Both with new
+            # members but also when we talk with THS. The field ths_name is intended to be
+            # used insted of first_ and last_name when we talk with THS. This can be useful
+            # if the name in Stackens systems does not match what THS has on file.
+            fields["ths_name"] = user.get("THS-namn")
+            fields["kth_account"] = user.get("KTH-konto")
 
-                # These fields are mainly here to make our verifications easier. Both with new
-                # members but also when we talk with THS. The field ths_name is intended to be
-                # used insted of first_ and last_name when we talk with THS. This can be useful
-                # if the name in Stackens systems does not match what THS has on file.
-                fields["ths_name"] = user.get("THS-namn")
-                fields["kth_account"] = user.get("KTH-konto")
+            # If the user has a kth.se-email address, assume the user part is the KTH account name
+            if user.get("mailadress") and "@" in user.get("mailadress") and not user.get("KTH-konto"):
+                email_fields = user.get("mailadress").split("@")
+                if email_fields[1] == "kth.se":
+                    fields["kth_account"] = email_fields[0]
 
-                # If the user has a kth.se-email address, assume the user part is the KTH account name
-                if user.get("mailadress") and "@" in user.get("mailadress") and not user.get("KTH-konto"):
-                    email_fields = user.get("mailadress").split("@")
-                    if email_fields[1] == "kth.se":
-                        fields["kth_account"] = email_fields[0]
+            # For users that do not have an email address try to construct one with the
+            # information we have on file.
+            if user.get("mailadress"):
+                fields["email"] = user.get("mailadress")
+            else:
+                kthname = user.get("KTH-konto")
+                if kthname:
+                    fields["email"] = kthname + "@kth.se"
+                elif self.is_valid_user(user):
+                    username = user.get("användarnamn")
+                    fields["email"] = username + "@stacken.kth.se"
 
-                # For users that do not have an email address try to construct one with the
-                # information we have on file.
-                if user.get("mailadress"):
-                    fields["email"] = user.get("mailadress")
-                else:
-                    kthname = user.get("KTH-konto")
-                    username = self.clean_username(user.get("användarnamn"))
-                    if kthname:
-                        fields["email"] = kthname + "@kth.se"
-                    else:
-                        fields["email"] = username + "@stacken.kth.se"
+            # For users that have left the club. Set a parted date and invalidate contract
+            if user.get("utträdesdatum"):
+                fields["date_parted"] = parse_date(user.get("utträdesdatum"))
+            else:
+                fields["has_signed"] = True
+                fields["date_parted"] = None
 
-                # For users that have left the club. Set a parted date and disable the user.
-                if user.get("utträdesdatum"):
-                    fields["date_parted"] = parse_date(user.get("utträdesdatum"))
-                    fields["is_active"] = False
-                else:
-                    fields["date_parted"] = None
+            # Assume that users with active accounts have signed the contract
+            # This is defined with the lack there of parentheses around the
+            # username in finger.json
+            if self.has_signed_contract(user.get("användarnamn")):
+                fields["has_signed"] = True
 
-                # Disable users that have have parted
-                if user.get("Utesluten") or user.get("Slutat"):
-                    fields["is_active"] = False
+            # Invalidate contract on users that have have parted
+            if user.get("Utesluten") or user.get("Slutat"):
+                fields["has_signed"] = False
 
-                # Disable users that have not yet signed the contract
-                # This is defined with parentheses sround the username in
-                # finger.json
-                if not self.has_signed_contract(user.get("användarnamn")):
-                    fields["is_active"] = False
+            # Use the "mailadress" to identify a user, this will of course break if
+            # the "mailadress" is updated on finger.json, TODO try to use the username
+            # if avaiable.
+            member, created = self.update_or_create(
+                email=user.get("mailadress"), defaults=fields
+            )
 
-                user, created = self.update_or_create(
-                    username=self.clean_username(user.get("användarnamn")), defaults=fields
+            # Create and/or update an account for the member
+            if fields.get("has_signed") and self.is_valid_user(user):
+                user_fields = {
+                    'member': member,
+                    'date_joined': fields.get("date_joined"),
+                    'is_superuser': False,
+                    'is_staff': False,
+                    'is_active': True,
+                }
+                User.objects.update_or_create(
+                    username=user.get("användarnamn"),
+                    defaults=user_fields
                 )
 
-
-def parse_date(datestr):
-    if datestr:
-        return parser.parse("%s 12:00:00 CET" % datestr)
-    else:
-        return None
-
-
-class User(AbstractUser):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
+class Member(models.Model):
+    first_name = models.CharField(max_length=30, null=True, default=None)
+    last_name = models.CharField(max_length=150, null=True, default=None)
+    email = models.CharField(max_length=254, null=True, default=None)
+    date_joined = models.DateTimeField(null=True, default=None)
     payed_year = models.PositiveSmallIntegerField(
         null=True, blank=True, verbose_name="Payed Year", help_text="The year the member has valid payed membership to."
     )
@@ -222,8 +231,11 @@ class User(AbstractUser):
     date_parted = models.DateTimeField(
         null=True, blank=True, verbose_name="Date parted", help_text="The date of when a member left the club."
     )
+    has_signed = models.BooleanField(
+        default=False, verbose_name="Has signed the contract", help_text="The user has signed the contract, account access is allowed."
+    )
 
-    objects = UserManager()
+    objects = MemberManager()
 
     def is_member(self):
         """
@@ -242,36 +254,6 @@ class User(AbstractUser):
             return False
 
     is_member.boolean = True
-
-    def is_account_disabled(self):
-        """
-        Like is_member, but give the user one extra year before the account is
-        disabled. This is nice and it makes the transision periodes like new
-        year easier to manage.
-        """
-
-        if self.has_parted():
-            return False
-
-        this_year = datetime.now().year
-        if self.last_member(format=2) < this_year - 1:
-            return True
-        else:
-            return False
-
-    def is_account_delete(self):
-        """
-        Like is_account_disabled, but 5 years instead of 1. This is used to figure
-        out what accounts we should remove.
-        """
-        if self.has_parted():
-            return False
-
-        this_year = datetime.now().year
-        if self.last_member(format=2) < this_year - 5:
-            return True
-        else:
-            return False
 
     def ths_claimed(self):
         """
@@ -327,3 +309,27 @@ class User(AbstractUser):
         if format == 2:
             return r
         return str(r)
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    get_full_name.short_description = "Full Name"
+
+def parse_date(datestr):
+    if datestr:
+        return parser.parse("%s 12:00:00 CET" % datestr)
+    else:
+        return None
+
+
+class User(AbstractUser):
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.BooleanField()
+    username = models.CharField(unique=True, max_length=150)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, default=None)
+
+    objects = UserManager()
