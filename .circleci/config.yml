@@ -24,6 +24,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install -U pip
             pip install -q -r requirements-dev.txt
 
       - save_cache:

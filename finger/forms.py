@@ -6,20 +6,22 @@ import json
 import re
 from .models import User
 
+
 class UploadFileForm(forms.Form):
     file = forms.FileField()
 
     def clean_file(self):
         try:
-            return json.load(self.cleaned_data['file'])
+            return json.load(self.cleaned_data["file"])
         except:
-            raise ValidationError("Must be proper json", code='badjson')
+            raise ValidationError("Must be proper json", code="badjson")
+
 
 class MailMembersForm(forms.Form):
-    subject = forms.CharField(label='Subject')
-    message = forms.CharField(label='Message', widget=forms.Textarea)
-    extra_to = forms.CharField(label='Extra To', required=False)
-    recipients = forms.CharField(label='Recipients', required=False)
+    subject = forms.CharField(label="Subject")
+    message = forms.CharField(label="Message", widget=forms.Textarea)
+    extra_to = forms.CharField(label="Extra To", required=False)
+    recipients = forms.CharField(label="Recipients", required=False)
 
     def get_members(self):
         all_users = User.objects.all()
@@ -28,7 +30,6 @@ class MailMembersForm(forms.Form):
         members = [user for user in all_users if user.is_member()]
 
         return members
-
 
 
 class PasswordResetForm(ca_forms.PasswordResetForm):
@@ -40,7 +41,7 @@ class PasswordResetForm(ca_forms.PasswordResetForm):
         2) Allow username@stacken.kth.se as well as (external) email address.
         """
         print("In override get_users, search for", email)
-        match = re.match(r'^([a-z0-9_-]+)@stacken\.kth\.se$', email)
+        match = re.match(r"^([a-z0-9_-]+)@stacken\.kth\.se$", email)
         if match:
             username = match.group(1)
             print("Club user name", username)

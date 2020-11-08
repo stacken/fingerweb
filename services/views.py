@@ -12,17 +12,21 @@ from .models import Service
 @login_required
 def service(request, name):
     service = get_object_or_404(Service, name=name)
-    action = request.POST.get('action')
-    show_secret = action in ('generate', 'show')
-    if action == 'generate':
+    action = request.POST.get("action")
+    show_secret = action in ("generate", "show")
+    if action == "generate":
         service.generate_password(request.user)
 
     account = service.account_for(request.user)
-    return render(request, 'services/service.html', {
-        'service': service,
-        'has_account': account and True,
-        'secret': show_secret and account and account.secret,
-    })
+    return render(
+        request,
+        "services/service.html",
+        {
+            "service": service,
+            "has_account": account and True,
+            "secret": show_secret and account and account.secret,
+        },
+    )
 
 
 def passwords(request, name):
@@ -32,25 +36,23 @@ def passwords(request, name):
         return HttpResponseForbidden()
 
     query = service.serviceuser_set
-    since = request.GET.get('since')
+    since = request.GET.get("since")
     if since:
         try:
-            since = datetime.strptime(since, '%Y-%m-%dT%H:%M:%S%Z')
+            since = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S%Z")
         except:
-            return JsonResponse({'msg': 'Bad date'}, status=400)
+            return JsonResponse({"msg": "Bad date"}, status=400)
         query = query.filter(modified__gte=since)
 
-    return JsonResponse(dict(
-        query.values_list('user__username', 'secret')
-    ))
+    return JsonResponse(dict(query.values_list("user__username", "secret")))
 
 
 def basic_auth(request):
-    auth_data = request.META.get('HTTP_AUTHORIZATION')
+    auth_data = request.META.get("HTTP_AUTHORIZATION")
     if not auth_data:
         return None, None
-    auth_method, auth_data = auth_data.split(' ')
-    if auth_method != 'Basic':
+    auth_method, auth_data = auth_data.split(" ")
+    if auth_method != "Basic":
         return None, None
-    auth_user, auth_key = str(b64decode(auth_data), 'ascii').split(':')
+    auth_user, auth_key = str(b64decode(auth_data), "ascii").split(":")
     return auth_user, auth_key

@@ -19,11 +19,11 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from finger.views import PasswordResetView
 
 urlpatterns = [
-    path('accounts/password_reset/', PasswordResetView.as_view(), name='password_reset'),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('admin/', admin.site.urls),
-    path('services/', include('services.urls')),
-    path('', include('finger.urls')),
+    path("accounts/password_reset/", PasswordResetView.as_view(), name="password_reset"),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("admin/", admin.site.urls),
+    path("services/", include("services.urls")),
+    path("", include("finger.urls")),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
