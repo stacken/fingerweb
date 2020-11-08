@@ -4,6 +4,7 @@ from django.db import transaction
 from optparse import make_option
 from finger.models import User
 from os import environ
+from dateutil import parser
 
 
 class Command(BaseCommand):
@@ -15,5 +16,11 @@ class Command(BaseCommand):
             print("No password given.  No admin created")
             return
         User.objects.filter(username="admin").delete()
-        User.objects.create_superuser("admin", "staff@stacken.kth.se", password)
+        User.objects.create_superuser(
+            "admin",
+            "staff@stacken.kth.se",
+            password,
+            is_active=True,
+            date_joined=parser.parse("1970-01-01 00:00:01 CET"),
+        )
         print("Created/updated admin accout")
