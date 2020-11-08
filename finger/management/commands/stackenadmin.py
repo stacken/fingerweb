@@ -13,14 +13,17 @@ class Command(BaseCommand):
     def handle(self, **options):
         password = environ.get("DJANGOADMIN_PASSWORD")
         if not password:
-            print("No password given.  No admin created")
+            print("No password given. No admin created/updated")
             return
-        User.objects.filter(username="admin").delete()
-        User.objects.create_superuser(
-            "admin",
-            "staff@stacken.kth.se",
-            password,
-            is_active=True,
-            date_joined=parser.parse("1970-01-01 00:00:01 CET"),
-        )
-        print("Created/updated admin accout")
+        if User.objects.filter(username="admin").exists():
+            print("Admin user already exists, update the existing user")
+            User.objects.get(username="admin").set_password(password)
+        else:
+            print("Create admin accout")
+            User.objects.create_superuser(
+                "admin",
+                "staff@stacken.kth.se",
+                password,
+                is_active=True,
+                date_joined=parser.parse("1970-01-01 00:00:01 CET"),
+            )
