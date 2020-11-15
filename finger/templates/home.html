@@ -2,14 +2,13 @@
 
 {% block content %}
 {% if user.member %}
-<h1>Välkommen {{user.member.get_full_name}}</h1>
+<h1>Welcome {{user.member.get_full_name}}</h1>
 
 <p>
-  Här kan du se data vi har om dig. Du kan läsa mer om vår
-  <a href="https://www.stacken.kth.se/club/integritetspolicy/">integritetspolicy</a>
-  på vår hemsida. Vill du ha någon information ändrad vad god och kontakta
-  <a href="https://www.stacken.kth.se/club/">styrelsen</a>. Inaktiva konton kommer bli
-  först inaktiverade, och sen borttagna.
+  Here is some data we have about you, you can read more about our
+  <a href="https://www.stacken.kth.se/en/club/privacy-policy/">privacy policy</a>
+  on our homepage. Contact the <a href="https://www.stacken.kth.se/en/club/">board</a>
+  if you like to have something changed.
 </p>
 
 {% if user.member.joined_years_ago > 8 %}
@@ -55,9 +54,9 @@
   </tr>
 </table>
 
-<h2>Tjänster på Stacken</h2>
+<h2>Services on Stacken</h2>
 
-<p>Här är en lista på tjänster på Stacken som du kan skapa ett konto på.</p>
+<p>Here is a list of services on Stacken. You can create and manage your account on them here.</p>
 
 <table class="servicetable">
   {% for service in services %}
