@@ -212,7 +212,7 @@ class StackenMemberAdmin(admin.ModelAdmin):
         "support_member",
     )
 
-    search_fields = ("first_name", "last_name", "ths_name", "kth_account")
+    search_fields = ("first_name", "last_name", "ths_name", "kth_account", "email")
 
     list_filter = (
         MemberListFilter,
