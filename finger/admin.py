@@ -22,7 +22,7 @@ class MemberListFilter(admin.SimpleListFilter):
 
     def ths_member_claimed(self):
         t = datetime.now()
-        if t.month <= 7:
+        if t.month <= 8:
             return Q(ths_claimed_vt__gte=t.year)
         return Q(ths_claimed_ht__gte=t.year)
 
@@ -74,7 +74,7 @@ class MemberListFilter(admin.SimpleListFilter):
 
 class MemberTHSStatus(admin.SimpleListFilter):
     t = datetime.now()
-    is_vt = t.month <= 7
+    is_vt = t.month <= 8
     title = f"THS Status VT{t.year}" if is_vt else f"THS Status HT{t.year}"
 
     parameter_name = "ths_status"
