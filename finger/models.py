@@ -321,10 +321,11 @@ class Member(models.Model):
         The user is a THS verified member
         """
         t = datetime.now()
-        if t.month <= 7:
-            return self.ths_verified_vt == t.year
-        else:
-            return self.ths_verified_ht == t.year
+        if t.month <= 7 and self.ths_verified_vt:
+            return self.ths_verified_vt >= t.year
+        elif self.ths_verified_ht:
+            return self.ths_verified_ht >= t.year
+        return False
 
     ths_verified.boolean = True
 
