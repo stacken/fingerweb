@@ -165,6 +165,26 @@ class MemberManager(models.Manager):
                 }
                 User.objects.update_or_create(username=user.get("användarnamn"), defaults=user_fields)
 
+    def inspect_data(self):
+
+        for member in self.all():
+
+            # Find members with the same email address
+            qdb = self.filter(email__exact=member.email)
+            if qdb.count() > 1 and member.email:
+                print(f"The email {member.email} exists on multiple accounts!")
+                for m in qdb:
+                    usr = User.objects.filter(id=m.id)
+                    print(f"Member({m.id}) with identifier ({m.identifier}) - {usr}")
+
+            # Find members with the same first and last name
+            qdb = self.filter(first_name__exact=member.first_name, last_name__exact=member.last_name)
+            if qdb.count() > 1:
+                print(f"The name {member.first_name} {member.last_name} exists on multiple accounts!")
+                for m in qdb:
+                    usr = User.objects.filter(id=m.id)
+                    print(f"{m.id} ({m.identifier}) - {usr}")
+
 
 class Member(models.Model):
     first_name = models.CharField(max_length=30, null=True, default=None)
