@@ -73,10 +73,12 @@ class MemberManager(models.Manager):
             # Because the user can choose to pay only for half the year we need to
             # verify THS members twice a year. In the old system we only noted what
             # year we checked the membership status.
-            if datetime.now().month <= 7:
+            if datetime.now().month <= 8:
                 fields["ths_claimed_vt"] = user.get("THS-studerande")
+                fields["ths_verified_vt"] = user.get("THS-studerande")
             else:
                 fields["ths_claimed_ht"] = user.get("THS-studerande")
+                fields["ths_verified_ht"] = user.get("THS-studerande")
 
             # Various simple fields that do not need that much comments...
             fields["title"] = user.get("titel")
