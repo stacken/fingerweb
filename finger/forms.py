@@ -5,6 +5,7 @@ from django.forms import ValidationError
 import json
 import re
 from .models import User
+from .models import Member
 
 
 class UploadFileForm(forms.Form):
@@ -48,6 +49,10 @@ class PasswordResetForm(ca_forms.PasswordResetForm):
             active_users = User.objects.filter(username__iexact=username, is_active=True)
         else:
             print("Externam email", email)
-            active_users = User.objects.filter(email__iexact=email, is_active=True)
+            member = Member.objects.filter(email__iexact=email).first()
+            if member:
+                active_users = User.objects.filter(member=member, is_active=True)
+            else:
+                active_users = User.objects.none()
         print("Found users:", active_users)
         return active_users
