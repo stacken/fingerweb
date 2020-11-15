@@ -131,10 +131,15 @@ class MemberManager(models.Manager):
             if user.get("Utesluten") or user.get("Slutat"):
                 fields["has_signed"] = False
 
-            # Use the "mailadress" to identify a user, this will of course break if
-            # the "mailadress" is updated on finger.json, TODO try to use the username
-            # if avaiable.
-            member, created = self.update_or_create(email=user.get("mailadress"), defaults=fields)
+            # We need to uniqily identify a member, if the member has an account in
+            # finger.json, and already have an existing fingerweb user account, I will
+            # lookup that user.id from the database and use that. Otherwise, I will
+            # fall back to the by-user provided email address.
+            if fields.get("has_signed") and self.is_valid_user(user):
+                user_from_db = User.objects.get(username=user.get("användarnamn"))
+                member, created = self.update_or_create(id=user_from_db.id, defaults=fields)
+            else:
+                member, created = self.update_or_create(email=user.get("mailadress"), defaults=fields)
 
             # Create and/or update an account for the member
             if fields.get("has_signed") and self.is_valid_user(user):
