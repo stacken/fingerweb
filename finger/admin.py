@@ -233,7 +233,7 @@ class StackenMemberAdmin(admin.ModelAdmin):
                     "payed_year",
                     ("ths_verified_vt", "ths_verified_ht"),
                     ("date_joined", "date_parted"),
-                    ("honorary_member", "support_member"),
+                    ("honorary_member", "support_member", "has_signed"),
                 )
             },
         ),
