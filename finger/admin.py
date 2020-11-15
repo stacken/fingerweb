@@ -100,6 +100,23 @@ class MemberTHSStatus(admin.SimpleListFilter):
                 return queryset.filter(Q(ths_verified_ht__exact=t.year))
 
 
+class MemberLoggedIn(admin.SimpleListFilter):
+    title = "Has Logged In"
+    parameter_name = "logged_in"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Yes"),
+            ("no", "No"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(~Q(last_login__exact=None))
+        if self.value() == "no":
+            return queryset.filter(Q(last_login__exact=None))
+
+
 def export_json(modeladmin, request, queryset):
     response = HttpResponse(content_type="application/json")
     serializers.serialize("json", queryset, stream=response)
@@ -195,7 +212,14 @@ class StackenMemberAdmin(admin.ModelAdmin):
 
     search_fields = ("first_name", "last_name", "ths_name", "kth_account")
 
-    list_filter = (MemberListFilter, "support_member", "honorary_member", MemberTHSStatus, "has_key")
+    list_filter = (
+        MemberListFilter,
+        "support_member",
+        "honorary_member",
+        MemberTHSStatus,
+        "has_key",
+        MemberLoggedIn,
+    )
 
     actions = (export_json, export_kortexp, export_ths)
 
