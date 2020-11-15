@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.core import serializers
 from django.http import HttpResponse
 from datetime import datetime, timedelta
+from django.urls import reverse
+from django.utils.html import escape, mark_safe
 import csv
 
 
@@ -164,14 +166,25 @@ class StackenUserAdmin(admin.ModelAdmin):
     list_display = (
         "username",
         "is_active",
+        "member_name"
     )
 
     search_fields = ["username"]
 
     fieldsets = (
-        (None, {"fields": ["username"]}),
+        (None, {"fields": ["username", "member"]}),
         ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
     )
+
+    def member_name(self, obj):
+        if obj.member:
+            link = reverse("admin:finger_member_change", args=[obj.member.id])
+            name = f"{obj.member.first_name} {obj.member.last_name}"
+            return mark_safe(f'<a href="{link}">{name}</a>')
+        return None
+
+    member_name.admin_order_field = "member_name"
+    member_name.short_description = "Member"
 
 class StackenMemberAdmin(admin.ModelAdmin):
     list_display = (
