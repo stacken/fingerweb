@@ -1,9 +1,12 @@
 from django.contrib import admin
 from .models import User
+from .models import Member
 from django.db.models import Q
 from django.core import serializers
 from django.http import HttpResponse
 from datetime import datetime, timedelta
+from django.urls import reverse
+from django.utils.html import escape, mark_safe
 import csv
 
 
@@ -160,25 +163,44 @@ export_ths.short_description = "Export as CSV for THS"
 
 
 class StackenUserAdmin(admin.ModelAdmin):
+    list_display = ("username", "is_active", "member_name")
+
+    search_fields = ["username"]
+
+    fieldsets = (
+        (None, {"fields": ["username", "member"]}),
+        ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
+    )
+
+    def member_name(self, obj):
+        if obj.member:
+            link = reverse("admin:finger_member_change", args=[obj.member.id])
+            name = f"{obj.member.first_name} {obj.member.last_name}"
+            return mark_safe(f'<a href="{link}">{name}</a>')
+        return None
+
+    member_name.admin_order_field = "member_name"
+    member_name.short_description = "Member"
+
+
+class StackenMemberAdmin(admin.ModelAdmin):
     list_display = (
-        "username",
         "get_full_name",
         "last_member",
         "is_member",
         "ths_claimed",
         "ths_verified",
         "support_member",
-        "is_active",
     )
 
-    search_fields = ("username", "first_name", "last_name", "ths_name", "kth_account")
+    search_fields = ("first_name", "last_name", "ths_name", "kth_account")
 
-    list_filter = (MemberListFilter, "support_member", "honorary_member", MemberTHSStatus, "has_key", "is_superuser")
+    list_filter = (MemberListFilter, "support_member", "honorary_member", MemberTHSStatus, "has_key")
 
     actions = (export_json, export_kortexp, export_ths)
 
     fieldsets = (
-        (None, {"fields": ("username", "title", "first_name", "last_name", "email", "address", "phone", "comments")}),
+        (None, {"fields": ("title", "first_name", "last_name", "email", "address", "phone", "comments")}),
         (
             "Medlemsstatus",
             {
@@ -192,8 +214,8 @@ class StackenUserAdmin(admin.ModelAdmin):
         ),
         ("Access", {"fields": ("has_key", "keycard_number")}),
         ("Kåren", {"fields": ("ths_name", ("ths_claimed_vt", "ths_claimed_ht"), "kth_account")}),
-        ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
     )
 
 
 admin.site.register(User, StackenUserAdmin)
+admin.site.register(Member, StackenMemberAdmin)
