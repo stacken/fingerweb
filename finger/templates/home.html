@@ -42,7 +42,11 @@
   </tr>
   <tr>
     <th>KTH account</th>
-    <td>{{ user.member.kth_account }}</td>
+    {% if user.member.kth_account %}
+      <td><a href="https://www.kth.se/profile/{{ user.member.kth_account }}">{{ user.member.kth_account }}</a></td>
+    {% else %}
+      <td>-</td>
+    {% endif %}
   </tr>
   <tr>
     <th>Keycard number</th>
