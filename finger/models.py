@@ -7,6 +7,7 @@ from dateutil import parser
 from datetime import datetime
 from datetime import timedelta
 
+
 class MemberManager(models.Manager):
     def is_valid_user(self, user):
         username = user.get("användarnamn")
@@ -133,23 +134,19 @@ class MemberManager(models.Manager):
             # Use the "mailadress" to identify a user, this will of course break if
             # the "mailadress" is updated on finger.json, TODO try to use the username
             # if avaiable.
-            member, created = self.update_or_create(
-                email=user.get("mailadress"), defaults=fields
-            )
+            member, created = self.update_or_create(email=user.get("mailadress"), defaults=fields)
 
             # Create and/or update an account for the member
             if fields.get("has_signed") and self.is_valid_user(user):
                 user_fields = {
-                    'member': member,
-                    'date_joined': fields.get("date_joined"),
-                    'is_superuser': False,
-                    'is_staff': False,
-                    'is_active': True,
+                    "member": member,
+                    "date_joined": fields.get("date_joined"),
+                    "is_superuser": False,
+                    "is_staff": False,
+                    "is_active": True,
                 }
-                User.objects.update_or_create(
-                    username=user.get("användarnamn"),
-                    defaults=user_fields
-                )
+                User.objects.update_or_create(username=user.get("användarnamn"), defaults=user_fields)
+
 
 class Member(models.Model):
     first_name = models.CharField(max_length=30, null=True, default=None)
@@ -232,7 +229,9 @@ class Member(models.Model):
         null=True, blank=True, verbose_name="Date parted", help_text="The date of when a member left the club."
     )
     has_signed = models.BooleanField(
-        default=False, verbose_name="Has signed the contract", help_text="The user has signed the contract, account access is allowed."
+        default=False,
+        verbose_name="Has signed the contract",
+        help_text="The user has signed the contract, account access is allowed.",
     )
 
     objects = MemberManager()
@@ -315,6 +314,7 @@ class Member(models.Model):
         return f"{self.first_name} {self.last_name}"
 
     get_full_name.short_description = "Full Name"
+
 
 def parse_date(datestr):
     if datestr:

@@ -163,11 +163,7 @@ export_ths.short_description = "Export as CSV for THS"
 
 
 class StackenUserAdmin(admin.ModelAdmin):
-    list_display = (
-        "username",
-        "is_active",
-        "member_name"
-    )
+    list_display = ("username", "is_active", "member_name")
 
     search_fields = ["username"]
 
@@ -185,6 +181,7 @@ class StackenUserAdmin(admin.ModelAdmin):
 
     member_name.admin_order_field = "member_name"
     member_name.short_description = "Member"
+
 
 class StackenMemberAdmin(admin.ModelAdmin):
     list_display = (
