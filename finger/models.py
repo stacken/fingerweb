@@ -176,6 +176,8 @@ class MemberManager(models.Manager):
                 for m in qdb:
                     usr = User.objects.filter(id=m.id)
                     print(f"Member({m.id}) with identifier ({m.identifier}) - {usr}")
+                    if not usr:
+                        m.delete()
 
             # Find members with the same first and last name
             qdb = self.filter(first_name__exact=member.first_name, last_name__exact=member.last_name)
@@ -184,6 +186,8 @@ class MemberManager(models.Manager):
                 for m in qdb:
                     usr = User.objects.filter(id=m.id)
                     print(f"{m.id} ({m.identifier}) - {usr}")
+                    if not usr:
+                        m.delete()
 
 
 class Member(models.Model):
