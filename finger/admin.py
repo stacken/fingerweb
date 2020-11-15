@@ -166,6 +166,8 @@ class StackenUserAdmin(admin.ModelAdmin):
         "is_active",
     )
 
+    search_fields = ["username"]
+
     fieldsets = (
         (None, {"fields": ["username"]}),
         ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
