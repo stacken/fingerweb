@@ -146,9 +146,6 @@ class MemberManager(models.Manager):
                 user_fields = {
                     "member": member,
                     "date_joined": fields.get("date_joined"),
-                    "is_superuser": False,
-                    "is_staff": False,
-                    "is_active": True,
                 }
                 User.objects.update_or_create(username=user.get("användarnamn"), defaults=user_fields)
 
@@ -331,10 +328,10 @@ def parse_date(datestr):
 class User(AbstractUser):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
+    is_superuser = models.BooleanField(default=False)
     username = models.CharField(unique=True, max_length=150)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField()
     member = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, default=None)
 
