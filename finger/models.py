@@ -365,6 +365,9 @@ class Member(models.Model):
 
     get_full_name.short_description = "Full Name"
 
+    def joined_years_ago(self):
+        return timezone.now().year - self.date_joined.year
+
 
 def parse_date(datestr):
     if datestr:
