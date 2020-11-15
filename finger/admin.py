@@ -100,7 +100,7 @@ class MemberTHSStatus(admin.SimpleListFilter):
                 return queryset.filter(Q(ths_verified_ht__exact=t.year))
 
 
-class MemberLoggedIn(admin.SimpleListFilter):
+class UserLoggedIn(admin.SimpleListFilter):
     title = "Has Logged In"
     parameter_name = "logged_in"
 
@@ -189,6 +189,8 @@ class StackenUserAdmin(admin.ModelAdmin):
         ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
     )
 
+    list_filter = [UserLoggedIn]
+
     def member_name(self, obj):
         if obj.member:
             link = reverse("admin:finger_member_change", args=[obj.member.id])
@@ -218,7 +220,6 @@ class StackenMemberAdmin(admin.ModelAdmin):
         "honorary_member",
         MemberTHSStatus,
         "has_key",
-        MemberLoggedIn,
     )
 
     actions = (export_json, export_kortexp, export_ths)
