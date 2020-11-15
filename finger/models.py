@@ -90,6 +90,7 @@ class MemberManager(models.Manager):
             fields["honorary_member"] = user.get("Hedersmedlem", False)
             fields["keycard_number"] = user.get("kortnr")
             fields["date_joined"] = parse_date(user.get("inträdesdatum", "1970-01-01"))
+            fields["identifier"] = user.get("fingerweb_identifier")
 
             # These fields are mainly here to make our verifications easier. Both with new
             # members but also when we talk with THS. The field ths_name is intended to be
@@ -120,7 +121,6 @@ class MemberManager(models.Manager):
             if user.get("utträdesdatum"):
                 fields["date_parted"] = parse_date(user.get("utträdesdatum"))
             else:
-                fields["has_signed"] = True
                 fields["date_parted"] = None
 
             # Assume that users with active accounts have signed the contract
@@ -133,15 +133,29 @@ class MemberManager(models.Manager):
             if user.get("Utesluten") or user.get("Slutat"):
                 fields["has_signed"] = False
 
-            # We need to uniqily identify a member, if the member has an account in
-            # finger.json, and already have an existing fingerweb user account, I will
-            # lookup that user.id from the database and use that. Otherwise, I will
-            # fall back to the by-user provided email address.
-            if fields.get("has_signed") and self.is_valid_user(user):
-                user_from_db = User.objects.get(username=user.get("användarnamn"))
-                member, created = self.update_or_create(id=user_from_db.id, defaults=fields)
+            # We need to uniqily identify a member in finger.json and map it to Member.
+            # Use the special key fingerweb_identifier if found in finger.json, if not
+            # found use the username.
+            #
+            # We have members without identifier and usernames, for these use the
+            # following fallbacks:
+            # - User provided email address
+            # - Stacken email adress (will be generated from the username (if it's exists))
+            # - First and last name
+            #
+            # If the above causes conflicts, add and fingerweb_identifier key to the member.
+            if fields["identifier"]:
+                member, _ = self.update_or_create(identifier__exact=fields["identifier"], defaults=fields)
             else:
-                member, created = self.update_or_create(email=user.get("mailadress"), defaults=fields)
+                user_from_db = User.objects.filter(username__exact=user.get("användarnamn")).first()
+                if self.is_valid_user(user) and user_from_db:
+                    member, _ = self.update_or_create(id=user_from_db.id, defaults=fields)
+                elif "@" in fields.get("email", ""):
+                    member, _ = self.update_or_create(email__exact=fields["email"], defaults=fields)
+                else:
+                    member, _ = self.update_or_create(
+                        first_name__exact=fields["first_name"], last_name__exact=fields["last_name"], defaults=fields
+                    )
 
             # Create and/or update an account for the member
             if fields.get("has_signed") and self.is_valid_user(user):
@@ -236,6 +250,13 @@ class Member(models.Model):
         default=False,
         verbose_name="Has signed the contract",
         help_text="The user has signed the contract, account access is allowed.",
+    )
+    identifier = models.CharField(
+        max_length=32,
+        default=None,
+        null=True,
+        verbose_name="A unique identifier",
+        help_text="A unique identifier used to map a fingerweb user to this entry.",
     )
 
     objects = MemberManager()
