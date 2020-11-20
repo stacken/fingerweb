@@ -128,6 +128,8 @@ class MemberManager(models.Manager):
             # username in finger.json
             if self.has_signed_contract(user.get("användarnamn")):
                 fields["has_signed"] = True
+            else:
+                fields["has_signed"] = False
 
             # Invalidate contract on users that have have parted
             if user.get("Utesluten") or user.get("Slutat"):
