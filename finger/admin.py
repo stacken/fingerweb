@@ -189,7 +189,7 @@ class StackenUserAdmin(admin.ModelAdmin):
         ("Admin", {"fields": ("is_superuser", "is_staff", "is_active")}),
     )
 
-    list_filter = [UserLoggedIn]
+    list_filter = [UserLoggedIn, "is_active"]
 
     def member_name(self, obj):
         if obj.member:
