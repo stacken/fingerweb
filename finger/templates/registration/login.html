@@ -12,7 +12,10 @@ class="login"
 {% block content %}
 
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+<p>
+  Your username and password didn't match, or your account was disabled due to inactivity.
+  If you are unable to login <a href="https://www.stacken.kth.se/en/club/">please contact us</a>.
+</p>
 {% endif %}
 
 {% if next %}
