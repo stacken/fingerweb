@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "fingerweb.urls"
 
-EMAIL_HOST = "smtp.kth.se"
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.kth.se")
 EMAIL_USE_TLS = False
 
 TEMPLATES = [
