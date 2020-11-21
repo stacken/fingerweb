@@ -9,4 +9,4 @@ gunicorn ~= 19.9.0
 django-environ ~= 0.4.5
 psycopg2-binary ~= 2.8.3
 python-dateutil ~= 2.8.0
-
+django-post_office ~= 3.5.2
