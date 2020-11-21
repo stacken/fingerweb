@@ -1,14 +1,23 @@
+from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from optparse import make_option
 from finger.models import Member
-import json
+from finger.models import User
 
 
 class Command(BaseCommand):
     help = "Update the database, execute with cron"
 
     def handle(self, **options):
+
+        print("Processing members")
         with transaction.atomic():
-            Member.objects.inspect_data()
+            for member in Member.objects.all():
+                if member.is_inactive():
+                    users = User.objects.filter(member=member.id, is_active=True)
+                    for user in users:
+                        print(f"Disable {user} (member {member})")
+                        user.is_active = False
+                        user.save()
