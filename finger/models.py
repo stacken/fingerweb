@@ -349,6 +349,12 @@ class Member(models.Model):
     def joined_years_ago(self):
         return timezone.now().year - self.date_joined.year
 
+    def __repr__(self):
+        return f"<Member: {self.get_full_name()} ({self.pk})>"
+
+    def __str__(self):
+        return f"{self.get_full_name()} (id: {self.pk})"
+
 
 def parse_date(datestr):
     if datestr:
@@ -368,3 +374,9 @@ class User(AbstractUser):
     member = models.ForeignKey(Member, on_delete=models.CASCADE, null=True, default=None)
 
     objects = UserManager()
+
+    def __repr__(self):
+        return f"<User: {self.username} ({self.pk})>"
+
+    def __str__(self):
+        return f"{self.username} (id: {self.pk})"
