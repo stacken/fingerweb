@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<h1>Send E-mail to the following users</h1>
+
+<p>
+    By pressing <em>Confirm</em>, you will queue the following E-Mails to be sent out:
+</p>
+
+<ul>
+{% for member in members %}
+<li>{{ member.email }}</li>
+{% endfor %}
+</ul>
+
+<div>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for member in members %}
+        <input type="hidden" name="_selected_action" value="{{ member.pk }}" />
+        {% endfor %}
+        <input type="hidden" name="action" value="send_email" />
+        <input type="submit" name="apply" value="Confirm" />
+    </form>
+</div>
+{% endblock %}

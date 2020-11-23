@@ -4,9 +4,12 @@ from .models import Member
 from django.db.models import Q
 from django.core import serializers
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.html import escape, mark_safe
+from post_office import mail
 import csv
 
 
@@ -222,7 +225,7 @@ class StackenMemberAdmin(admin.ModelAdmin):
         "has_key",
     )
 
-    actions = (export_json, export_kortexp, export_ths)
+    actions = (export_json, export_kortexp, export_ths, "send_email")
 
     fieldsets = (
         (None, {"fields": ("title", "first_name", "last_name", "email", "address", "phone", "comments")}),
@@ -240,6 +243,21 @@ class StackenMemberAdmin(admin.ModelAdmin):
         ("Access", {"fields": ("has_key", "keycard_number")}),
         ("Kåren", {"fields": ("ths_name", ("ths_claimed_vt", "ths_claimed_ht"), "kth_account")}),
     )
+
+    def send_email(self, request, queryset):
+        if "apply" in request.POST:
+            for member in queryset:
+                mail.send(
+                    member.email,
+                    template="welcome_email",
+                    context={"first_name": member.first_name, "last_name": member.last_name},
+                )
+            self.message_user(request, "E-Mails queued!")
+            return HttpResponseRedirect(request.get_full_path())
+        else:
+            return render(request, "admin/send_email_confirmation.html", context={"members": queryset})
+
+    send_email.short_description = "Send Welcome E-Mail"
 
 
 admin.site.register(User, StackenUserAdmin)

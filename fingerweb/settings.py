@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 import environ
 import os
+import datetime
 
 ADMINS = (("Stacken", "staff@stacken.kth.se"),)
 MANAGERS = ADMINS
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "static_precompiler",
+    "post_office",
     "finger",
     "services",
 ]
@@ -66,8 +68,16 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "fingerweb.urls"
 
-EMAIL_HOST = "smtp.kth.se"
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.kth.se")
 EMAIL_USE_TLS = False
+EMAIL_BACKEND = "post_office.EmailBackend"
+
+POST_OFFICE = {
+    "MESSAGE_ID_ENABLED": True,
+    "MESSAGE_ID_FQDN": "fingerweb.stacken.kth.se",
+    "RETRY_INTERVAL": datetime.timedelta(hours=6),
+    "MAX_RETRIES": 4,
+}
 
 TEMPLATES = [
     {
