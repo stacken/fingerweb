@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.html import escape, mark_safe
 from post_office import mail
+from post_office.models import EmailTemplate
 import csv
 
 
@@ -247,17 +248,26 @@ class StackenMemberAdmin(admin.ModelAdmin):
     def send_email(self, request, queryset):
         if "apply" in request.POST:
             for member in queryset:
-                mail.send(
-                    member.email,
-                    template="welcome_email",
-                    context={"first_name": member.first_name, "last_name": member.last_name},
-                )
+                emails = member.get_emails()
+                sender_name = request.user.member.get_full_name()
+                sender_email = f"{request.user.username}@stacken.kth.se"
+                if emails:
+                    mail.send(
+                        emails,
+                        sender=f"Datorföreningen Stacken via {sender_name} <{sender_email}>",
+                        template=request.POST["template"],
+                        context={"member": member},
+                    )
             self.message_user(request, "E-Mails queued!")
             return HttpResponseRedirect(request.get_full_path())
         else:
-            return render(request, "admin/send_email_confirmation.html", context={"members": queryset})
+            return render(
+                request,
+                "admin/send_email_confirmation.html",
+                context={"members": queryset, "templates": EmailTemplate.objects.all()},
+            )
 
-    send_email.short_description = "Send Welcome E-Mail"
+    send_email.short_description = "Send E-Mail"
 
 
 admin.site.register(User, StackenUserAdmin)
