@@ -274,7 +274,7 @@ class Member(models.Model):
             return False
 
         t = timezone.now()
-        if ((self.last_member(format=2)+1) >= t.year) or (t - timedelta(days=365) < self.date_joined):
+        if ((self.last_member(format=2) + 1) >= t.year) or (t - timedelta(days=365) < self.date_joined):
             return True
         else:
             return False
