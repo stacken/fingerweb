@@ -339,7 +339,7 @@ class Member(models.Model):
         return str(r)
 
     def is_inactive(self):
-        return datetime.now().year > self.last_member(format=2)
+        return datetime.now().year > (self.last_member(format=2) + 1)
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
