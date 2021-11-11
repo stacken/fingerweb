@@ -349,6 +349,15 @@ class Member(models.Model):
     def joined_years_ago(self):
         return timezone.now().year - self.date_joined.year
 
+    def get_emails(self):
+        ret = []
+        if self.email:
+            ret.append(f"{self.get_full_name()} <{self.email}>")
+        user = User.objects.filter(member=self.id)
+        if user and user.count() < 2:
+            ret.append(f"{self.get_full_name()} <{user[0].username}@stacken.kth.se>")
+        return list(set(ret))
+
     def __repr__(self):
         return f"<Member: {self.get_full_name()} ({self.pk})>"
 
