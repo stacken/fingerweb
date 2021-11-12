@@ -21,3 +21,11 @@ class Command(BaseCommand):
                         print(f"Disable {user} (member {member})")
                         user.is_active = False
                         user.save()
+
+        print("Processing users")
+        with transaction.atomic():
+            for user in User.objects.filter(is_active=False):
+                if not user.member.is_inactive():
+                    print(f"Enable {user} (member {user.member})")
+                    user.is_active = True
+                    user.save()
