@@ -6,7 +6,7 @@ cd /app
 ./manage.py stackenadmin
 
 (
-    while gunicorn fingerweb.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile - --capture-output; do
+    while su finger -c "gunicorn fingerweb.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile - --capture-output"; do
         sleep 10
     done
 ) &
