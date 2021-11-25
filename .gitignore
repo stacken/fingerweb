@@ -1,9 +1,9 @@
 *~
 __pycache__
 
-/db.sqlite3
+/app/db.sqlite3
 /finger/static/.sass-cache/
-/static/
+/app/static/
 /.env
 /.vscode
 /import
