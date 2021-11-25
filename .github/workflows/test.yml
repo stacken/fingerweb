@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -q -r requirements-dev.txt
+        pip install -q -r app/requirements-dev.txt
     - name: Test with pytest
       env:
         SECRET_KEY: t
@@ -29,4 +29,5 @@ jobs:
         DATABASE_URL: "sqlite://:memory:"
         DEBUG: true
       run: |
+        cd app
         pytest
