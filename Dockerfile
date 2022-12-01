@@ -2,7 +2,7 @@
 #
 # Launch a build container so we do not need to care about junk in the production image
 #
-FROM python:3 AS build
+FROM python:3.8 AS build
 
 # This is needed to start the Django app
 ARG SECRET_KEY=none
@@ -35,7 +35,7 @@ RUN rm db.sqlite3
 #
 # The production container
 #
-FROM python:3
+FROM python:3.8
 EXPOSE 8080
 
 COPY --from=build /app /app
