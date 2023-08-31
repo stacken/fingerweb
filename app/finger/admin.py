@@ -33,7 +33,7 @@ class MemberListFilter(admin.SimpleListFilter):
     def active_member(self, request, queryset):
         """
         List members that we consider active. Members that have
-        payed this year, have verified their THS status the last
+        paid this year, have verified their THS status the last
         half year or are honorary members. New members that
         joined the last year are also considered active.
 

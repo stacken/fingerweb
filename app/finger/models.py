@@ -174,7 +174,7 @@ class Member(models.Model):
     email = models.CharField(max_length=254, null=True, default=None)
     date_joined = models.DateTimeField(null=True, default=None)
     payed_year = models.PositiveSmallIntegerField(
-        null=True, blank=True, verbose_name="Payed Year", help_text="The year the member has valid payed membership to."
+        null=True, blank=True, verbose_name="Paid Year", help_text="The year the member has valid paid membership to."
     )
     ths_verified_vt = models.PositiveSmallIntegerField(
         null=True,
@@ -266,7 +266,7 @@ class Member(models.Model):
     def is_member(self):
         """
         Return status if the user is considered an active member. If the user has
-        a parted date, has not payed or verified THS membership (unless a new member)
+        a parted date, has not paid or verified THS membership (unless a new member)
         this year, consider the user not a member.
         """
 
