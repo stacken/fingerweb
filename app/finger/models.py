@@ -389,7 +389,7 @@ class User(AbstractUser):
         if self.member.email:
             return self.member.email
         else:
-            return '%s@stacken.kth.se' % self.username
+            return "%s@stacken.kth.se" % self.username
 
     def __repr__(self):
         return f"<User: {self.username} ({self.pk})>"
