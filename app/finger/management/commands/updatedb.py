@@ -11,7 +11,6 @@ class Command(BaseCommand):
     help = "Update the database, execute with cron"
 
     def handle(self, **options):
-
         print("Processing members")
         with transaction.atomic():
             for member in Member.objects.all():
