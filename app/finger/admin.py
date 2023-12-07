@@ -186,7 +186,7 @@ export_ths.short_description = "Export as CSV for THS"
 class StackenUserAdmin(admin.ModelAdmin):
     list_display = ("username", "is_active", "member_name")
 
-    search_fields = ["username"]
+    search_fields = ["username", "member__first_name", "member__last_name"]
 
     fieldsets = (
         (None, {"fields": ["username", "member"]}),
