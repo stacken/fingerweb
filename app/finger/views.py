@@ -10,7 +10,7 @@ from finger.decorators import staff_or_superuser_required
 from services.models import Service
 
 from .forms import MailMembersForm, PasswordResetForm, UploadFileForm
-from .models import User
+from .models import Member, User
 
 
 @login_required
@@ -20,11 +20,13 @@ def index(request):
 
 @staff_or_superuser_required
 def upload_json(request):
+    # Used only as a test util, to get some output on what happens when
+    # trying to update the data.
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             with transaction.atomic():
-                User.objects.update_data(form.cleaned_data["file"])
+                Member.objects.update_data(form.cleaned_data["file"])
             return HttpResponseRedirect("/admin/finger/user/")
     else:
         form = UploadFileForm()
