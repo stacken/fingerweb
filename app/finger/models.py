@@ -149,7 +149,13 @@ class MemberManager(models.Manager):
             if fields["identifier"]:
                 member, _ = self.update_or_create(identifier__exact=fields["identifier"], defaults=fields)
             else:
-                user_from_db = User.objects.filter(username__exact=user.get("användarnamn")).first()
+                try:
+                    user_from_db = User.objects.get(username=user.get("användarnamn"))
+                except User.DoesNotExist:
+                    user_from_db = User.objects.get(kth_account=fields["kth_account"])
+                except User.DoesNotExist:
+                    user_from_db = None
+
                 if self.is_valid_user(user) and user_from_db:
                     member, _ = self.update_or_create(id=user_from_db.id, defaults=fields)
                 elif "@" in fields.get("email", ""):
