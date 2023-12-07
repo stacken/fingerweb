@@ -152,9 +152,10 @@ class MemberManager(models.Manager):
                 try:
                     user_from_db = User.objects.get(username=user.get("användarnamn"))
                 except User.DoesNotExist:
-                    user_from_db = User.objects.get(member__kth_account=fields["kth_account"])
-                except User.DoesNotExist:
-                    user_from_db = None
+                    try:
+                        user_from_db = User.objects.get(member__kth_account=fields["kth_account"])
+                    except User.DoesNotExist:
+                        user_from_db = None
 
                 if self.is_valid_user(user) and user_from_db:
                     member, _ = self.update_or_create(id=user_from_db.id, defaults=fields)
