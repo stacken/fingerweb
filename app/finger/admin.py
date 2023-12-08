@@ -202,7 +202,7 @@ class StackenUserAdmin(admin.ModelAdmin):
             return mark_safe(f'<a href="{link}">{name}</a>')
         return None
 
-    member_name.admin_order_field = "member_name"
+    member_name.admin_order_field = ("member__first_name", "member__last_name")
     member_name.short_description = "Member"
 
 
