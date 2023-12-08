@@ -40,7 +40,7 @@ def passwords(request, name):
     if since:
         try:
             since = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S%Z")
-        except:
+        except Exception:
             return JsonResponse({"msg": "Bad date"}, status=400)
         query = query.filter(modified__gte=since)
 

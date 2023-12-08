@@ -26,7 +26,7 @@ class MemberManager(models.Manager):
 
     def has_signed_contract(self, username):
         if self.is_valid_user({"användarnamn": username}):
-            return not "(" in username
+            return "(" not in username
         else:
             return False
 

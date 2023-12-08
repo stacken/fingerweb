@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from datetime import datetime, timedelta
 from django.urls import reverse
-from django.utils.html import escape, mark_safe
+from django.utils.html import mark_safe
 from post_office import mail
 from post_office.models import EmailTemplate
 import csv
@@ -173,7 +173,7 @@ def export_ths(modeladmin, request, queryset):
         if user.ths_claimed():
             writer.writerow([user_name, user_email])
         else:
-            writer.writerow([f"Stacken User {user_number}", f"not-ths-member@stacken.kth.se"])
+            writer.writerow([f"Stacken User {user_number}", "not-ths-member@stacken.kth.se"])
 
         user_number += 1
 

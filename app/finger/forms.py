@@ -1,5 +1,4 @@
 from django import forms
-from django.core.mail import send_mail
 from django.contrib.auth import forms as ca_forms
 from django.forms import ValidationError
 import json
@@ -14,7 +13,7 @@ class UploadFileForm(forms.Form):
     def clean_file(self):
         try:
             return json.load(self.cleaned_data["file"])
-        except:
+        except Exception:
             raise ValidationError("Must be proper json", code="badjson")
 
 

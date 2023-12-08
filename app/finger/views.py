@@ -10,7 +10,7 @@ from finger.decorators import staff_or_superuser_required
 from services.models import Service
 
 from .forms import MailMembersForm, PasswordResetForm, UploadFileForm
-from .models import Member, User
+from .models import Member
 
 
 @login_required
@@ -79,7 +79,7 @@ def mail_members(request):
             messages = [(subject, message, sender, email) for (_, email) in recipients]
             try:
                 send_mass_mail(messages, fail_silently=False)
-            except:
+            except Exception:
                 context["exception"] = sys.exc_info()
 
         return render(request, "mail_members_test.html", context)
