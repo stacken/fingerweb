@@ -148,6 +148,15 @@ class MemberManager(models.Manager):
             # If the above causes conflicts, add and fingerweb_identifier key to the member.
             if fields["identifier"]:
                 member, _ = self.update_or_create(identifier__exact=fields["identifier"], defaults=fields)
+
+            elif fields["kth_account"]:
+                try:
+                    member, _ = self.update_or_create(kth_account=fields["kth_account"], defaults=fields)
+                except Member.DoesNotExist:
+                    pass
+                except Member.MultipleObjectsReturned:
+                    raise Exception("Multiple members have kth account %r" % fields["kth_account"])
+
             else:
                 user_from_db = None
                 if user.get("användarnamn"):
@@ -157,14 +166,6 @@ class MemberManager(models.Manager):
                         pass
                     except User.MultipleObjectsReturned:
                         raise Exception("Multiple users have username %r" % user.get("användarnamn"))
-
-                if user_from_db is None and fields["kth_account"]:
-                    try:
-                        user_from_db = User.objects.get(member__kth_account=fields["kth_account"])
-                    except User.DoesNotExist:
-                        pass
-                    except User.MultipleObjectsReturned:
-                        raise Exception("Multiple users have kth account %r" % fields["kth_account"])
 
                 if self.is_valid_user(user) and user_from_db:
                     member, _ = self.update_or_create(id=user_from_db.id, defaults=fields)
