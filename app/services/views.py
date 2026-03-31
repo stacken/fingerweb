@@ -1,5 +1,5 @@
 from base64 import b64decode
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
@@ -39,7 +39,7 @@ def passwords(request, name):
     since = request.GET.get("since")
     if since:
         try:
-            since = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S%Z")
+            since = datetime.strptime(since, "%Y-%m-%dT%H:%M:%S%Z").astimezone(timezone.utc)
         except Exception:
             return JsonResponse({"msg": "Bad date"}, status=400)
         query = query.filter(modified__gte=since)
