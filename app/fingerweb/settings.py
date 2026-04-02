@@ -153,3 +153,6 @@ STATICFILES_FINDERS = (
     # other finders..
     "static_precompiler.finders.StaticPrecompilerFinder",
 )
+
+# Things from Django 3.0 upgrade
+DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
