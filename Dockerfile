@@ -1,8 +1,7 @@
-
 #
 # Launch a build container so we do not need to care about junk in the production image
 #
-FROM python:3.8 AS build
+FROM python:3.10 AS build
 
 # This is needed to start the Django app
 ARG SECRET_KEY=none
@@ -35,21 +34,21 @@ RUN rm db.sqlite3
 #
 # The production container
 #
-FROM python:3.8
+FROM python:3.10
 EXPOSE 8080
 
-COPY --from=build /app /app
+RUN adduser --no-create-home --gecos FALSE --disabled-password finger
 
 RUN apt-get update \
 	&& apt-get -y install nginx ruby-sass \
 	&& rm -rf /var/lib/apt/lists/*
 
+COPY --from=build --chown=finger /app /app
+
 RUN pip install -r /app/requirements.txt
 WORKDIR /app
 
-RUN adduser --no-create-home --gecos FALSE --disabled-password finger \
-	&& sed -i "s/XXX_BUILD_DATE_XXX/`date +'%F %T'`/" /app/fingerweb/settings.py \
-	&& chown -R finger:finger /app
+RUN sed -i "s/XXX_BUILD_DATE_XXX/`date +'%F %T'`/" /app/fingerweb/settings.py
 
 ADD conf/nginx.conf /etc/nginx/nginx.conf
 ADD entrypoint.sh /app/entrypoint.sh
