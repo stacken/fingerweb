@@ -131,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-gb"
 
-TIME_ZONE = "CET"
+TIME_ZONE = "Europe/Stockholm"
 
 USE_I18N = True
 
@@ -153,3 +153,6 @@ STATICFILES_FINDERS = (
     # other finders..
     "static_precompiler.finders.StaticPrecompilerFinder",
 )
+
+# Things from Django 3.0 upgrade
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
