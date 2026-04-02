@@ -131,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-gb"
 
-TIME_ZONE = "CET"
+TIME_ZONE = "Europe/Stockholm"
 
 USE_I18N = True
 
