@@ -155,4 +155,4 @@ STATICFILES_FINDERS = (
 )
 
 # Things from Django 3.0 upgrade
-DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
