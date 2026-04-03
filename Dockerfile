@@ -1,7 +1,7 @@
 #
 # Launch a build container so we do not need to care about junk in the production image
 #
-FROM python:3.10 AS build
+FROM python:3.10-slim AS build
 
 # This is needed to start the Django app
 ARG SECRET_KEY=none
@@ -10,7 +10,7 @@ ARG DATABASE_URL=sqlite:///db.sqlite3
 
 # Install sass
 RUN apt-get update
-RUN apt-get -y install ruby-sass
+RUN apt-get -y install ruby-sass build-essential postgresql-client
 
 # Deploy files and install requirements
 ADD app/requirements.txt /app/requirements.txt
@@ -34,13 +34,13 @@ RUN rm db.sqlite3
 #
 # The production container
 #
-FROM python:3.10
+FROM python:3.10-slim
 EXPOSE 8080
 
 RUN adduser --no-create-home --gecos FALSE --disabled-password finger
 
 RUN apt-get update \
-	&& apt-get -y install nginx ruby-sass \
+	&& apt-get -y install nginx ruby-sass postgresql-client \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY --from=build --chown=finger /app /app
